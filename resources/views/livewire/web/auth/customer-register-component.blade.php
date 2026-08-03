@@ -1,20 +1,19 @@
 <div>
-    <div class="modal fade" id="signup" tabindex="-1" role="dialog">
+    <!-- Signup Modal -->
+    <div class="modal fade" id="signup" tabindex="-1" role="dialog" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content auth-modal">
                 <button type="button" class="btn-close qty_close" data-bs-dismiss="modal"
-    aria-label="Close" @if(!Auth::check()) disabled style="pointer-events:none; opacity:0.5;" @endif></button>
+                    aria-label="Close" id="signup-close-btn" style="display: none;"></button>
 
                 <div class="modal-body">
                     <div class="row">
-                        <!-- Left Side (optional image / promo) -->
                         <div class="col-md-5 d-none d-md-block">
                             <div class="auth-side-img">
                                 <img class="img-fluid" src="web/images/login-side.jpg" alt="Signup">
                             </div>
                         </div>
 
-                        <!-- Right Side (Signup Form) -->
                         <div class="col-md-7 col-sm-12">
                             <div class="auth-content">
                                 <h4 class="ec-title">Create Account</h4>
@@ -40,19 +39,17 @@
                                         <input type="password"
                                             class="form-control @error('password') is-invalid @enderror"
                                             wire:model="password" name="password" placeholder="Password" required>
-                                        @error('passowrd')
+                                        @error('password')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
                                     <button type="submit" class="btn btn-primary w-100">Signup</button>
                                 </form>
 
-                                <!-- Divider -->
                                 <div class="auth-divider">
                                     <span>OR</span>
                                 </div>
 
-                                <!-- Google Signup -->
                                 <a href="{{ route('google.login') }}" class="btn btn-danger w-100 mb-3">
                                     <i class="fab fa-google me-2"></i> Sign up with Google
                                 </a>
@@ -68,12 +65,13 @@
             </div>
         </div>
     </div>
-    {{-- login --}}
-    <div class="modal fade" id="login" tabindex="-1" role="dialog">
+
+    <!-- Login Modal -->
+    <div class="modal fade" id="login" tabindex="-1" role="dialog" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content auth-modal">
                 <button type="button" class="btn-close qty_close" data-bs-dismiss="modal"
-    aria-label="Close" @if(!Auth::check()) disabled style="pointer-events:none; opacity:0.5;" @endif></button>
+                    aria-label="Close" id="login-close-btn" style="display: none;"></button>
 
                 <div class="modal-body">
                     <div class="row">
@@ -86,14 +84,13 @@
                         <div class="col-md-7 col-sm-12">
                             <div class="auth-content">
                                 <h4 class="ec-title">Welcome Back</h4>
-                                <p class="mb-3">Login to your account</p>
+                                <p class="mb-3">Login to your account to continue</p>
 
                                 <form wire:submit.prevent="login">
                                     @csrf
                                     <div class="form-group mb-3">
-                                        <input type="email" class="form-control"
-                                            wire:model="email @error('email') is-invalid @enderror" name="email"
-                                            placeholder="Email Address" required>
+                                        <input type="email" class="form-control @error('email') is-invalid @enderror"
+                                            wire:model="email" name="email" placeholder="Email Address" required>
                                         @error('email')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
@@ -118,9 +115,9 @@
                                 </a>
 
                                 <p class="text-center">
-    Don’t have an account?
-    <a href="#" wire:click.prevent="showSignup">Signup</a>
-</p>
+                                    Don't have an account?
+                                    <a href="#" wire:click.prevent="showSignup">Signup</a>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -129,15 +126,79 @@
         </div>
     </div>
 </div>
-{{-- <script>
-    window.addEventListener('close-register', () => {
-        // console.log('close event worker started');
-        const modal = bootstrap.Modal.getInstance(document.getElementById('signup'));
-        modal.hide();
+
+<script>
+    // Modal control
+    window.addEventListener('switch-to-signup', () => {
+        const modalEl = document.getElementById('signup');
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        
+        // Remove backdrop static to prevent closing on outside click
+        modalEl.setAttribute('data-bs-backdrop', 'static');
+        modalEl.setAttribute('data-bs-keyboard', 'false');
+        
+        modal.show();
     });
+
+    window.addEventListener('switch-to-login', () => {
+        const modalEl = document.getElementById('login');
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        
+        // Remove backdrop static to prevent closing on outside click
+        modalEl.setAttribute('data-bs-backdrop', 'static');
+        modalEl.setAttribute('data-bs-keyboard', 'false');
+        
+        modal.show();
+    });
+
     window.addEventListener('close-login', () => {
-        // console.log('close event worker started');
-        const modal = bootstrap.Modal.getInstance(document.getElementById('login'));
-        modal.hide();
+        // Close signup modal
+        const signupModal = bootstrap.Modal.getInstance(document.getElementById('signup'));
+        if (signupModal) {
+            signupModal.hide();
+        }
+        
+        // Close login modal
+        const loginModal = bootstrap.Modal.getInstance(document.getElementById('login'));
+        if (loginModal) {
+            loginModal.hide();
+        }
     });
-</script> --}}
+    // Force login for checkout
+window.addEventListener('force-login', (event) => {
+    // Open login modal
+    const loginModal = document.getElementById('login');
+    if (loginModal) {
+        const modal = bootstrap.Modal.getOrCreateInstance(loginModal);
+        loginModal.setAttribute('data-bs-backdrop', 'static');
+        loginModal.setAttribute('data-bs-keyboard', 'false');
+        modal.show();
+    }
+});
+
+// Listen for force-login event from Livewire
+document.addEventListener('livewire:initialized', function () {
+    Livewire.on('force-login', (data) => {
+        const loginModal = document.getElementById('login');
+        if (loginModal) {
+            const modal = bootstrap.Modal.getOrCreateInstance(loginModal);
+            loginModal.setAttribute('data-bs-backdrop', 'static');
+            loginModal.setAttribute('data-bs-keyboard', 'false');
+            modal.show();
+        }
+    });
+    
+    Livewire.on('close-login', () => {
+        // Close both modals
+        ['login', 'signup'].forEach(id => {
+            const modalEl = document.getElementById(id);
+            if (modalEl) {
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) {
+                    modal.hide();
+                }
+            }
+        });
+    });
+});
+</script>

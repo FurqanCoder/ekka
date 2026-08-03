@@ -1,18 +1,25 @@
-@props(['product', 'col' => 3,])
+@props([
+    'product',
+    'col' => 3,
+    'showActions' => false,
+    'addCartMethod' => null,
+    'wishMethod' => null,
+    'quickViewMethod' => null,
+])
 
 @php
     // Images
-    $thumbnail = $product->media->where('is_thumbnail', true)->first()->file_path
+    $thumbnail = optional($product->media->where('is_thumbnail', true)->first())->file_path
         ?? asset('images/default.png');
 
-    $hoverImage = $product->media->where('is_thumbnail', false)->first()->file_path
+    $hoverImage = optional($product->media->where('is_thumbnail', false)->first())->file_path
         ?? $thumbnail;
 
     // Prices
-    $oldPrice = $product->prices->base_price
+    $oldPrice = optional($product->prices)->base_price
         ?? $product->variants->min('base_price');
 
-    $newPrice = $product->prices->final_price
+    $newPrice = optional($product->prices)->final_price
         ?? $product->variants->min('price');
 
     // Variant Option Values
@@ -48,23 +55,51 @@
                 </a>
 
                 {{-- Discount --}}
-                @if ($product->prices->discount_value > 0)
+                @if (optional($product->prices)->discount_value > 0)
                     <span class="flags">
-                        <span class="sale bg-danger">@if ($product->prices->discount_type === 'percent')
-                                                                {{ intval($product->prices->discount_value) }}% OFF
-                                                            @elseif($product->prices->discount_type === 'fixed')
-                                                                {{ intval($product->prices->discount_value) }} Rs OFF
+                        <span class="sale bg-danger">@if (optional($product->prices)->discount_type === 'percent')
+                                                                {{ intval(optional($product->prices)->discount_value) }}% OFF
+                                                            @elseif(optional($product->prices)->discount_type === 'fixed')
+                                                                {{ intval(optional($product->prices)->discount_value) }} Rs OFF
                                                             @endif</span>
                     </span>
                 @endif
 
                 {{-- Action Buttons --}}
-                <div class="ec-pro-actions">
-                    @livewire('web.components.quick-view', ['id' => $product->id])
-                    @livewire('web.components.add-cart-button', ['id' => $product->id])
-                    @livewire('web.components.wish.button', ['id' => $product->id])
-                </div>
+               @if ($showActions)
+                   <div class="ec-pro-actions">
+                       @if ($quickViewMethod)
+                           <button type="button" wire:click.prevent="{{ $quickViewMethod }}({{ $product->id }})" class="ec-btn-group compare" title="Quick View">
+                               <i class="fi-rr-eye"></i>
+                           </button>
+                       @else
+                           <a class="ec-btn-group compare" href="{{ route('web-product', $product->slug) }}" title="Quick View">
+                               <i class="fi-rr-eye"></i>
+                           </a>
+                       @endif
 
+                       @if ($addCartMethod)
+                           <button type="button" wire:click.prevent="{{ $addCartMethod }}({{ $product->id }})" title="Add To Cart" class="add-to-cart">
+                               <i class="fi-rr-shopping-basket"></i> Add To Cart
+                           </button>
+                       @else
+                           <a href="{{ route('web-product', $product->slug) }}" title="Add To Cart" class="add-to-cart">
+                               <i class="fi-rr-shopping-basket"></i> Add To Cart
+                           </a>
+                       @endif
+
+                       @if ($wishMethod)
+                           <button type="button" wire:click.prevent="{{ $wishMethod }}({{ $product->id }})" title="Wishlist" class="ec-btn-group wishlist @if($inWishlist ?? false) active @endif">
+                               <i class="fi-rr-heart"></i>
+                           </button>
+                       @else
+                           <a class="ec-btn-group wishlist" href="{{ route('web.wish') }}" title="Wishlist">
+                               <i class="fi-rr-heart"></i>
+                           </a>
+                       @endif
+                   </div>
+               @endif
+ 
             </div>
         </div>
 

@@ -10,7 +10,8 @@ use App\Models\Product;
 use App\Models\ProductOption;
 use App\Models\ProductPrice;
 use App\Models\Tag;
-use Illuminate\Support\Facades\Log;
+use App\Services\CartService;
+use Illuminate\Support\Facades\Cache;
 
 class ShopComponent extends Component
 {
@@ -59,14 +60,40 @@ class ShopComponent extends Component
 
     public function mount()
     {
-        // Load options
-        $this->categories = Category::with('children')->whereNull('parent_id')->get();
-        $this->sizes = ProductOption::where('name', 'Size')->first()?->values ?? [];
-        $this->colors = ProductOption::where('name', 'Color')->first()?->values ?? [];
-        $this->material = ProductOption::where('name', 'Material')->first()?->values ?? [];
-        $this->tags = Tag::all();
+        // Cache static shop filters for faster page loads
+        $this->categories = Cache::remember('shop_filters.categories', 3600, function () {
+            return Category::with('children')->whereNull('parent_id')->get();
+        });
 
-        // Sync selected with applied (from URL)
+        $this->sizes = Cache::remember('shop_filters.sizes', 3600, function () {
+            return ProductOption::where('name', 'Size')->first()?->values ?? [];
+        });
+
+        $this->colors = Cache::remember('shop_filters.colors', 3600, function () {
+            return ProductOption::where('name', 'Color')->first()?->values ?? [];
+        });
+
+        $this->material = Cache::remember('shop_filters.material', 3600, function () {
+            return ProductOption::where('name', 'Material')->first()?->values ?? [];
+        });
+
+        $this->tags = Cache::remember('shop_filters.tags', 3600, function () {
+            return Tag::all();
+        });
+
+        // Restore previous search and sort from session when URL is not present
+        $this->sort = $this->sort ?: session('shop_sort', '');
+        $this->search = $this->search ?: session('shop_search', '');
+
+        $storedFilters = session('shop_filters', []);
+        $this->appliedCategories = $this->appliedCategories ?: ($storedFilters['categories'] ?? []);
+        $this->appliedSizes = $this->appliedSizes ?: ($storedFilters['sizes'] ?? []);
+        $this->appliedColors = $this->appliedColors ?: ($storedFilters['colors'] ?? []);
+        $this->appliedMaterial = $this->appliedMaterial ?: ($storedFilters['material'] ?? []);
+        $this->appliedMinPrice = $this->appliedMinPrice ?: ($storedFilters['minPrice'] ?? '');
+        $this->appliedMaxPrice = $this->appliedMaxPrice ?: ($storedFilters['maxPrice'] ?? '');
+
+        // Sync selected with applied filters
         $this->selectedCategories = $this->appliedCategories;
         $this->selectedSizes = $this->appliedSizes;
         $this->selectedColors = $this->appliedColors;
@@ -77,11 +104,13 @@ class ShopComponent extends Component
 
     public function updatedSort()
     {
+        session(['shop_sort' => $this->sort]);
         $this->resetPage();
     }
 
     public function updatedSearch()
     {
+        session(['shop_search' => $this->search]);
         $this->resetPage();
     }
 
@@ -95,10 +124,6 @@ class ShopComponent extends Component
             $this->selectedCategories[] = $categoryId;
         }
         
-        Log::info('Category toggled', [
-            'categoryId' => $categoryId,
-            'selectedCategories' => $this->selectedCategories
-        ]);
     }
 
     public function toggleSize($size)
@@ -109,10 +134,6 @@ class ShopComponent extends Component
             $this->selectedSizes[] = $size;
         }
         
-        Log::info('Size toggled', [
-            'size' => $size,
-            'selectedSizes' => $this->selectedSizes
-        ]);
     }
 
     public function toggleColor($color)
@@ -123,10 +144,6 @@ class ShopComponent extends Component
             $this->selectedColors[] = $color;
         }
         
-        Log::info('Color toggled', [
-            'color' => $color,
-            'selectedColors' => $this->selectedColors
-        ]);
     }
 
     public function toggleMaterial($material)
@@ -147,14 +164,15 @@ class ShopComponent extends Component
         $this->appliedMaterial = $this->selectedMaterial;
         $this->appliedMinPrice = $this->minPrice;
         $this->appliedMaxPrice = $this->maxPrice;
-        
-        Log::info('Filters applied', [
-            'appliedCategories' => $this->appliedCategories,
-            'appliedSizes' => $this->appliedSizes,
-            'appliedColors' => $this->appliedColors,
-            'appliedMinPrice' => $this->appliedMinPrice,
-            'appliedMaxPrice' => $this->appliedMaxPrice,
-        ]);
+
+        session(['shop_filters' => [
+            'categories' => $this->selectedCategories,
+            'sizes' => $this->selectedSizes,
+            'colors' => $this->selectedColors,
+            'material' => $this->selectedMaterial,
+            'minPrice' => $this->minPrice,
+            'maxPrice' => $this->maxPrice,
+        ]]);
         
         $this->resetPage();
     }
@@ -178,13 +196,55 @@ class ShopComponent extends Component
         $this->resetPage();
     }
 
+    public function addToCart($productId)
+    {
+        $cartService = app(CartService::class);
+        $product = Product::with('variants')->find($productId);
+
+        if (!$product) {
+            $this->dispatch('toast', [
+                'message' => 'Product not found.',
+                'type' => 'error',
+            ]);
+            return;
+        }
+
+        if ($product->variants->count() > 0) {
+            $this->dispatch('toast', [
+                'message' => 'Please select a variant on the product page.',
+                'type' => 'error',
+            ]);
+            return;
+        }
+
+        $result = $cartService->add($productId, null, 1);
+        $this->dispatch('toast', [
+            'message' => $result['message'],
+            'type' => $result['status'],
+        ]);
+
+        if ($result['status'] === 'success') {
+            $this->dispatch('cart-updated');
+        }
+    }
+
+    public function toggleWishlist($productId)
+    {
+        $added = app('wishlist')->toggle($productId);
+        $this->dispatch('countWish');
+        $this->dispatch('toast', [
+            'message' => $added ? 'Added to wishlist.' : 'Removed from wishlist.',
+            'type' => 'success',
+        ]);
+    }
+
+    public function showQuickView($productId)
+    {
+        $this->emit('showQuickModal', $productId);
+    }
+
     public function render()
     {
-        Log::info('Rendering with filters', [
-            'appliedCategories' => $this->appliedCategories,
-            'appliedSizes' => $this->appliedSizes,
-            'appliedColors' => $this->appliedColors,
-        ]);
         
         $query = Product::query()
             ->select('products.*')
@@ -196,7 +256,6 @@ class ShopComponent extends Component
             $query->whereHas('categories', function ($q) use ($cats) {
                 $q->whereIn('categories.id', $cats);
             });
-            Log::info('Category filter applied', ['categories' => $cats]);
         }
 
         // SIZE FILTER
@@ -206,7 +265,6 @@ class ShopComponent extends Component
                     $q2->where('name', 'Size');
                 })->whereIn('value', $this->appliedSizes);
             });
-            Log::info('Size filter applied', ['sizes' => $this->appliedSizes]);
         }
 
         // COLOR FILTER
@@ -216,7 +274,6 @@ class ShopComponent extends Component
                     $q2->where('name', 'Color');
                 })->whereIn('value', $this->appliedColors);
             });
-            Log::info('Color filter applied', ['colors' => $this->appliedColors]);
         }
 
         // MATERIAL FILTER
@@ -242,7 +299,6 @@ class ShopComponent extends Component
                     $q->where('final_price', '<=', $maxPrice);
                 }
             });
-            Log::info('Price filter applied', ['min' => $minPrice, 'max' => $maxPrice]);
         }
 
         // SEARCH
@@ -282,7 +338,6 @@ class ShopComponent extends Component
 
         $products = $query->paginate(12);
         
-        Log::info('Products found', ['count' => $products->total()]);
 
         return view('livewire.web.shop-component', [
             'products' => $products,

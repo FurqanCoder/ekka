@@ -10,9 +10,8 @@ class ShippingManager extends Component
 {
     public $zones, $methods;
 
-    // Form data
-    public $zoneId, $zoneName, $regions = [];
-    public $methodId, $methodName, $type = 'flat_rate', $cost, $estimated_days, $zone_id;
+    public $zoneId, $zoneName, $regions = '';
+    public $methodId, $methodName, $type = 'flat_rate', $cost = 0, $estimated_days, $zone_id;
 
     public function mount()
     {
@@ -25,18 +24,17 @@ class ShippingManager extends Component
         $this->methods = ShippingMethod::with('zone')->get();
     }
 
-    /** ------------------------------
-     * Zone Functions
-     * ------------------------------ */
     public function saveZone()
     {
         $this->validate([
             'zoneName' => 'required|string|max:255',
         ]);
 
+        $regions = array_values(array_filter(array_map('trim', explode(',', (string) $this->regions))));
+
         ShippingZone::updateOrCreate(
             ['id' => $this->zoneId],
-            ['name' => $this->zoneName, 'regions' => $this->regions]
+            ['name' => $this->zoneName, 'regions' => $regions]
         );
 
         $this->reset(['zoneId', 'zoneName', 'regions']);
@@ -49,7 +47,7 @@ class ShippingManager extends Component
         $zone = ShippingZone::findOrFail($id);
         $this->zoneId = $zone->id;
         $this->zoneName = $zone->name;
-        $this->regions = $zone->regions ?? [];
+        $this->regions = is_array($zone->regions) ? implode(', ', $zone->regions) : '';
     }
 
     public function deleteZone($id)
@@ -58,9 +56,6 @@ class ShippingManager extends Component
         $this->loadData();
     }
 
-    /** ------------------------------
-     * Method Functions
-     * ------------------------------ */
     public function saveMethod()
     {
         $this->validate([

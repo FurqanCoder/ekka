@@ -1,0 +1,639 @@
+/*==================================================================
+  LUXURY BLACK & GOLD THEME — override stylesheet
+  Load this AFTER demo1.css / style.css / responsive.css
+  Toggle dark/light by adding  data-theme="light"  or data-theme="dark"
+  to the <html> tag. Defaults to dark (luxury black+gold) if omitted.
+==================================================================*/
+
+/* -------------------------------------------------
+   1. COLOR TOKENS
+------------------------------------------------- */
+:root{
+  /* Core gold palette (shared by both modes) */
+  --gold:          #d4af37;
+  --gold-bright:   #f2cf65;
+  --gold-soft:     #e8c766;
+  --gold-deep:     #a8842c;
+  --gold-line:     rgba(212,175,55,.35);
+
+  /* ---- DARK / NIGHT MODE (default) ---- */
+  --bg-primary:     #0b0b0d;
+  --bg-secondary:   #131316;
+  --bg-elevated:    #1b1b1f;
+  --bg-header:      #0d0d10;
+  --bg-footer:      #0a0a0c;
+  --border-soft:    rgba(212,175,55,.16);
+  --text-body:      #cfc9ba;
+  --text-heading:   #f3ead2;
+  --text-muted:     #8f887a;
+  --text-on-gold:   #14120a;
+
+  --primary:        var(--gold);
+  --primary-hover:  var(--gold-bright);
+  --primary-active: var(--gold-deep);
+  --secondary:      #2a2a30;
+  --secondary-hover:#3a3a42;
+
+  --shadow-gold:    0 4px 24px rgba(212,175,55,.18);
+  --shadow-soft:    0 8px 30px rgba(0,0,0,.45);
+
+  /* Product photography surface — kept light/neutral in BOTH themes so
+     photos never look "cut out". Card text tokens are separate from
+     --text-heading/--text-body because those are tuned for the dark
+     page background, not for text sitting on this light card. */
+  --surface-photo:   #f4efe2;
+  --card-heading:    #241f12;
+  --card-body:       #5c5644;
+  --card-muted:      #8a8270;
+  --card-accent:     var(--gold-deep);
+}
+
+/* ---- LIGHT MODE ---- */
+[data-theme="light"]{
+  --bg-primary:     #faf7f0;
+  --bg-secondary:   #ffffff;
+  --bg-elevated:    #ffffff;
+  --bg-header:      #ffffff;
+  --bg-footer:      #17161a;
+  --border-soft:    rgba(180,140,30,.25);
+  --text-body:      #4a4536;
+  --text-heading:   #201c12;
+  --text-muted:     #8a8270;
+  --text-on-gold:   #1a1608;
+
+  --primary:        #b8892c;
+  --primary-hover:  #d4af37;
+  --primary-active: #96701f;
+  --secondary:      #f1e9d2;
+  --secondary-hover:#e6d9ae;
+
+  --shadow-gold:    0 4px 20px rgba(184,137,44,.20);
+  --shadow-soft:    0 8px 24px rgba(20,15,0,.08);
+
+  --surface-photo:  #ffffff;
+  --card-heading:   var(--text-heading);
+  --card-body:      var(--text-body);
+  --card-muted:     var(--text-muted);
+  --card-accent:    var(--primary);
+}
+
+/* -------------------------------------------------
+   2. ANIMATED LUXURY BACKGROUND
+   A slow gold/black sheen drifts behind everything,
+   plus a soft drifting-particle layer for depth.
+------------------------------------------------- */
+html{ background-color: var(--bg-primary) !important; }
+
+/* NOTE: background-color and background-image are set as separate
+   properties on purpose (not the `background` shorthand). The shorthand
+   resets background-image too, and if the shorthand carries !important
+   that reset becomes !important as well — silently killing any gradient
+   declared afterwards. Keeping them separate avoids that trap. */
+body{
+  position: relative;
+  color: var(--text-body) !important;
+  background-color: var(--bg-primary) !important;
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(212,175,55,.14), transparent 45%),
+    radial-gradient(circle at 85% 75%, rgba(212,175,55,.12), transparent 50%),
+    linear-gradient(120deg, var(--bg-primary), var(--bg-secondary), var(--bg-primary)) !important;
+  background-size: 200% 200%, 200% 200%, 300% 300% !important;
+  background-repeat: no-repeat !important;
+  animation: luxuryDrift 18s ease-in-out infinite !important;
+}
+
+[data-theme="light"] body{
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(184,137,44,.13), transparent 45%),
+    radial-gradient(circle at 85% 75%, rgba(184,137,44,.11), transparent 50%),
+    linear-gradient(120deg, var(--bg-primary), #f3ead0, var(--bg-primary)) !important;
+}
+
+@keyframes luxuryDrift{
+  0%   { background-position: 0% 50%, 100% 50%, 0% 50%; }
+  50%  { background-position: 100% 50%, 0% 50%, 100% 50%; }
+  100% { background-position: 0% 50%, 100% 50%, 0% 50%; }
+}
+
+/* Floating gold-dust particle layer (decorative, ignores pointer events).
+   z-index:-1 puts it behind normal page content automatically — no need
+   to force position/z-index onto headers, containers, etc. */
+body::before{
+  content:"";
+  position: fixed;
+  top: 0; right: 0; bottom: 0; left: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .45;
+  background-image:
+    radial-gradient(2px 2px at 20% 30%, var(--gold-line) 0, transparent 60%),
+    radial-gradient(2px 2px at 70% 65%, var(--gold-line) 0, transparent 60%),
+    radial-gradient(1.5px 1.5px at 40% 80%, var(--gold-line) 0, transparent 60%),
+    radial-gradient(1.5px 1.5px at 85% 15%, var(--gold-line) 0, transparent 60%),
+    radial-gradient(2px 2px at 55% 45%, var(--gold-line) 0, transparent 60%);
+  background-size: 100% 100%;
+  animation: goldDust 16s linear infinite;
+}
+@keyframes goldDust{
+  0%   { transform: translateY(0) translateX(0); }
+  50%  { transform: translateY(-24px) translateX(10px); }
+  100% { transform: translateY(0) translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  body, body::before{ animation: none !important; }
+}
+
+/* -------------------------------------------------
+   3. HEADER / NAV
+------------------------------------------------- */
+.ec-header,
+.header-top,
+.ec-header-bottom{
+  background-color: var(--bg-header) !important;
+  border-color: var(--border-soft) !important;
+}
+.sticky-nav.menu_fixed,
+.sticky-nav.menu_fixed_up{
+  background: var(--bg-header) !important;
+  box-shadow: var(--shadow-soft) !important;
+}
+.header-logo img{ filter: drop-shadow(0 0 6px rgba(212,175,55,.25)); }
+
+.ec-main-menu ul li a{ color: var(--text-heading) !important; }
+.ec-main-menu ul li:hover > a,
+.ec-main-menu ul li.active > a{ color: var(--primary) !important; }
+.ec-main-menu > ul > li:hover > a:before,
+.ec-main-menu > ul > li.active > a:before{ background: var(--primary) !important; }
+.ec-main-menu ul li .mega-menu,
+.ec-main-menu ul li.dropdown ul.sub-menu{
+  background: var(--bg-elevated) !important;
+  border: 1px solid var(--border-soft) !important;
+  box-shadow: var(--shadow-soft) !important;
+}
+.ec-main-menu ul li .mega-menu li ul li a,
+.ec-main-menu ul li.dropdown ul li a{ color: var(--text-body) !important; }
+.ec-main-menu ul li .mega-menu li ul li a:hover,
+.ec-main-menu ul li.dropdown ul li a:hover{ color: var(--primary) !important; }
+
+.header-icon i, .ec-header-bottons i,
+.header_svg{ color: var(--text-heading) !important; fill: var(--text-heading) !important; }
+.ec-header-bottons .ec-header-btn:hover .header_svg{ fill: var(--primary) !important; }
+.ec-header-bottons .ec-header-btn .ec-header-count{
+  background-color: var(--primary) !important;
+  color: var(--text-on-gold) !important;
+}
+
+.header-search .form-control{
+  background: var(--bg-elevated) !important;
+  border-color: var(--primary) !important;
+  color: var(--text-body) !important;
+}
+.submit i, .submit .header_svg{ color: var(--primary) !important; fill: var(--primary) !important; }
+
+/* -------------------------------------------------
+   4. TYPOGRAPHY / HEADINGS
+------------------------------------------------- */
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6{ color: var(--text-heading) !important; }
+
+.section-title .ec-title{ color: var(--text-heading) !important; }
+.section-title .ec-title:before,
+.section-title .ec-title:after{ background: var(--primary) !important; }
+.section-title .ec-bg-title{ color: var(--primary) !important; opacity:.08 !important; }
+.section-title .sub-title{ color: var(--text-muted) !important; }
+.section-title .sub-title a{ color: var(--primary) !important; }
+
+a{ color: var(--text-body); }
+a:hover{ color: var(--primary) !important; }
+
+/* -------------------------------------------------
+   5. BUTTONS
+------------------------------------------------- */
+.btn-primary,
+.btn-check:checked + .btn-primary,
+.btn-check:focus + .btn-primary,
+.btn-check:active + .btn-primary,
+.show > .btn-primary.dropdown-toggle{
+  background: linear-gradient(135deg, var(--gold-soft), var(--primary) 55%, var(--gold-deep)) !important;
+  border-color: var(--primary) !important;
+  color: var(--text-on-gold) !important;
+  box-shadow: var(--shadow-gold);
+  transition: filter .25s ease, transform .2s ease;
+}
+.btn-primary:hover,
+.btn-hover-color-primary:hover{
+  filter: brightness(1.12);
+  transform: translateY(-1px);
+  background: linear-gradient(135deg, var(--gold-bright), var(--primary-hover) 55%, var(--primary)) !important;
+  border-color: var(--primary-hover) !important;
+  color: var(--text-on-gold) !important;
+}
+.btn-secondary{
+  background: var(--secondary) !important;
+  border-color: var(--secondary) !important;
+  color: var(--text-heading) !important;
+}
+.btn-secondary:hover{
+  background: var(--secondary-hover) !important;
+  border-color: var(--secondary-hover) !important;
+}
+.btn-color-dark{
+  background: var(--bg-elevated) !important;
+  border-color: var(--border-soft) !important;
+  color: var(--text-heading) !important;
+}
+.btn-outline-primary{
+  color: var(--primary) !important;
+  border-color: var(--primary) !important;
+  background: transparent !important;
+}
+.btn-outline-primary:hover{
+  background: var(--primary) !important;
+  color: var(--text-on-gold) !important;
+}
+
+/* -------------------------------------------------
+   6. PRICES / BADGES / RIBBONS
+------------------------------------------------- */
+.ec-price span.new-price,
+.ec-fs-price span.new-price,
+span.new-price,
+.ec-single-price span.new-price,
+.quickview-pro-content .ec-quickview-price span.new-price{
+  color: var(--primary) !important;
+}
+span.old-price{ color: var(--text-muted) !important; }
+
+.ec-product-discount-label,
+.ec-product-ribbon,
+.percentage{
+  background: var(--primary) !important;
+  color: var(--text-on-gold) !important;
+}
+
+/* -------------------------------------------------
+   7. CARDS / PRODUCT TILES
+   Whole card (photo + text) shares ONE surface so there's no seam
+   between a light photo box and a dark text box.
+------------------------------------------------- */
+.ec-product-inner,
+.ec-fs-pro-inner,
+.ec-vendor-card,
+.ec-blog-inner,
+.quickview-pro-content{
+  background-color: var(--surface-photo) !important;
+  border-color: var(--border-soft) !important;
+}
+.card,
+.ec-sidebar-wrap,
+.ec_ser_inner,
+.ec-test-item{
+  background-color: var(--bg-elevated) !important;
+  border-color: var(--border-soft) !important;
+}
+
+.ec-product-inner .ec-pro-image,
+.ec-product-inner .ec-pro-content{ background-color: var(--surface-photo) !important; }
+.ec-product-inner .ec-pro-content .ec-pro-title a,
+.ec-fs-pro-inner .ec-fs-pro-title a,
+.quickview-pro-content .ec-quick-title a{ color: var(--card-heading) !important; }
+.ec-product-inner .ec-pro-content .ec-pro-title a:hover,
+.quickview-pro-content .ec-quick-title a:hover{ color: var(--card-accent) !important; }
+.ec-product-inner .ec-pro-content .ec-price,
+.quickview-pro-content .ec-quickview-price{ color: var(--card-muted) !important; }
+.ec-product-inner .ec-pro-content .ec-price span.new-price,
+.quickview-pro-content .ec-quickview-price span.new-price{ color: var(--card-accent) !important; }
+.quickview-pro-content .quickview-para,
+.quickview-pro-content p{ color: var(--card-body) !important; }
+
+.ec-product-inner:hover,
+.ec_ser_inner:hover,
+.ec-brand-item:hover img{
+  box-shadow: var(--shadow-gold) !important;
+  border-color: var(--gold-line) !important;
+}
+
+/* absolute overlay icon buttons (quickview/wishlist/compare/add-to-cart)
+   sit ON TOP of the light photo, so a dark-gold circle reads as an
+   intentional accent rather than a clash */
+.ec-product-inner .ec-pro-image .ec-pro-actions .ec-btn-group,
+.ec-product-inner .ec-pro-image .ec-pro-actions .add-to-cart,
+.ec-product-inner .ec-pro-image .ec-pro-actions .wishlist,
+.ec-product-inner .ec-pro-image .ec-pro-actions .compare,
+.ec-product-inner .ec-pro-image a.quickview{
+  background-color: var(--bg-elevated) !important;
+  border-color: var(--border-soft) !important;
+  color: var(--text-heading) !important;
+}
+.ec-product-inner .ec-pro-image .ec-pro-actions .ec-btn-group:hover,
+.ec-product-inner .ec-pro-image .ec-pro-actions .add-to-cart:hover,
+.ec-product-inner .ec-pro-image a.quickview:hover{
+  color: var(--primary) !important;
+  box-shadow: var(--shadow-gold) !important;
+}
+
+/* -------------------------------------------------
+   8. CATEGORY / BANNER / OFFER
+------------------------------------------------- */
+.ec-category-section .ec-cat-tab-nav .cat-link{
+  background-color: var(--bg-elevated) !important;
+}
+.ec-category-section .ec-cat-tab-nav .cat-link:hover,
+.ec-category-section .ec-cat-tab-nav .cat-link.active{
+  background: linear-gradient(135deg, var(--gold-soft), var(--primary)) !important;
+}
+.ec-category-section .ec-cat-tab-nav .cat-link .cat-desc span{ color: var(--text-heading) !important; }
+.ec-category-section .ec-cat-tab-nav .cat-link:hover .cat-desc span,
+.ec-category-section .ec-cat-tab-nav .cat-link.active .cat-desc span{ color: var(--text-on-gold) !important; }
+
+.banner-block .bnr-overlay{ border-color: var(--border-soft) !important; }
+.banner-block .banner-text .ec-banner-title{ color: var(--text-heading) !important; }
+.banner-block .banner-content{ background-color: rgba(0,0,0,.55) !important; }
+.banner-block .banner-content .ec-banner-btn a{
+  background: var(--primary) !important;
+  color: var(--text-on-gold) !important;
+}
+
+.ec-offer-content .ec-offer-title,
+.ec-offer-content .ec-offer-stitle{ color: var(--primary) !important; }
+.ec-offer-content .ec-offer-price{ color: var(--text-heading) !important; }
+
+/* -------------------------------------------------
+   9. TESTIMONIALS / SLIDER CONTROLS
+------------------------------------------------- */
+.ec-test-section{ background: var(--bg-primary) !important; }
+.ec-test-section .ec-test-name{ color: var(--primary) !important; }
+.ec-test-section .ec-test-designation,
+.ec-test-section .ec-test-desc{ color: var(--text-body) !important; }
+.ec-test-section .slick-dots li{
+  background-color: var(--bg-elevated) !important;
+  border-color: var(--primary) !important;
+}
+.svg_img.test_svg, .fi-rr-quote-right{ fill: var(--primary) !important; color: var(--primary) !important; }
+
+.main-slider-nav .swiper-buttons .swiper-button-next,
+.main-slider-nav .swiper-buttons .swiper-button-prev,
+.slick-arrow:before{ color: var(--primary) !important; }
+.main-slider-nav .swiper-buttons .swiper-button-next,
+.main-slider-nav .swiper-buttons .swiper-button-prev{
+  background-color: var(--primary) !important;
+  color: var(--text-on-gold) !important;
+}
+.main-slider-dot .swiper-pagination-bullet{ border-color: var(--primary) !important; }
+.main-slider-dot .swiper-pagination-bullet.swiper-pagination-bullet-active,
+.main-slider-dot .swiper-pagination-bullet:hover{ background-color: var(--primary) !important; }
+
+/* -------------------------------------------------
+   10. FOOTER
+------------------------------------------------- */
+.ec-footer{
+  background: var(--bg-footer) !important;
+  color: #b9ad8c !important;
+}
+.ec-footer .footer-top{ border-color: var(--border-soft) !important; }
+.ec-footer .footer-top .ec-footer-widget .ec-footer-heading{
+  color: var(--gold-soft) !important;
+  border-color: var(--border-soft) !important;
+}
+.ec-footer .footer-top .ec-footer-widget .ec-footer-links .ec-footer-link a{ color: #b9ad8c !important; }
+.ec-footer .footer-top .ec-footer-widget .ec-footer-links .ec-footer-link a:hover{ color: var(--primary) !important; }
+.footer-bottom{ border-color: var(--border-soft) !important; }
+.footer-bottom .ec-copy{ color: #b9ad8c !important; }
+.footer-bottom .ec-copy .site-name{ color: var(--primary) !important; }
+.footer-bottom-social ul li a,
+.header-top-social ul li a{
+  background: var(--bg-elevated) !important;
+  border-color: var(--border-soft) !important;
+  color: var(--text-heading) !important;
+}
+.footer-offer{ background: linear-gradient(90deg, var(--gold-deep), var(--primary)) !important; }
+.footer-off-msg span, .footer-off-msg a{ color: var(--text-on-gold) !important; }
+
+/* -------------------------------------------------
+   11. FORMS / INPUTS / CHECKBOXES
+------------------------------------------------- */
+.form-control, input, textarea, select,
+.ec-select-inner, .ec-cart-select-inner, .ec-rg-select-inner, .ec-bl-select-inner{
+  background-color: var(--bg-elevated) !important;
+  border-color: var(--border-soft) !important;
+  color: var(--text-body) !important;
+}
+.form-control:focus{
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px var(--gold-line) !important;
+}
+.ec-sidebar-block .ec-sb-block-content li .ec-sidebar-block-item .checked{
+  background: var(--bg-elevated) !important;
+  border-color: var(--border-soft) !important;
+}
+.ec-sidebar-block .ec-sb-block-content li .ec-sidebar-block-item .checked:after{
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+}
+.noUi-connect{ background: var(--primary) !important; }
+.noUi-base{ background: var(--secondary) !important; }
+.noUi-horizontal .noUi-handle{
+  background: var(--bg-elevated) !important;
+  border-color: var(--primary) !important;
+}
+
+/* -------------------------------------------------
+   12. MISC ACCENTS
+------------------------------------------------- */
+::selection{ background: var(--primary); color: var(--text-on-gold); }
+
+.text-primary{ color: var(--primary) !important; }
+.bg-primary{ background-color: var(--primary) !important; }
+.border-primary{ border-color: var(--primary) !important; }
+
+#scrollUp{
+  background-color: var(--primary) !important;
+  color: var(--text-on-gold) !important;
+}
+#scrollUp:hover{ background: var(--gold-bright) !important; }
+
+.ec-side-cart, .ec-tools-sidebar, .category-sidebar, .filter-sidebar{
+  background-color: var(--bg-elevated) !important;
+}
+.ec-side-cart .ec-cart-inner .ec-cart-title,
+.ec-side-cart .ec-menu-title{ border-color: var(--border-soft) !important; }
+.ec-side-cart .ec-cart-inner .ec-cart-title .cart_title,
+.ec-side-cart .ec-menu-title .menu_title{ color: var(--gold-soft) !important; }
+
+.modal-content{
+  background-color: var(--bg-elevated) !important;
+  border-color: var(--border-soft) !important;
+}
+.modal-header{ border-color: var(--border-soft) !important; }
+
+/*==================================================================
+  PATCH 2 — product cards & single-product page fixes
+  Product photography is shot on light backgrounds, so we keep the
+  IMAGE surface neutral/light in both themes (prevents the "cut out"
+  look) while everything AROUND it (title, price, tabs, etc.) still
+  follows the luxury dark/light theme.
+==================================================================*/
+.single-pro-img,
+.single-nav-thumb .single-slide,
+.qty-nav-thumb .slick-slide,
+.ec-page-detail .ec-cat-bnr,
+.modal-dialog .qty-slide,
+.ec-vendor-card .ec-vendor-prod .ec-prod-img,
+.ec-catalog-multi-vendor .ec-vendor-card .ec-vendor-card-avtar .ec-vendor-card-img{
+  background-color: var(--surface-photo) !important;
+}
+.single-pro-desc,
+.ec-single-pro-tab-content{
+  background-color: var(--bg-elevated) !important;
+}
+
+/* --- breadcrumb --- */
+.ec-breadcrumb{
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-soft) !important;
+}
+.ec-breadcrumb .ec-breadcrumb-title,
+.ec-breadcrumb-list li a{ color: var(--text-heading) !important; }
+.ec-breadcrumb-list li.active,
+.ec-breadcrumb-item + .ec-breadcrumb-item::before{ color: var(--primary) !important; }
+
+/* --- single product: thumbnails / gallery nav --- */
+.single-nav-thumb .slick-slide img{ border-color: var(--border-soft) !important; }
+.single-nav-thumb .slick-slide:hover img,
+.single-nav-thumb .slick-slide.slick-current.slick-active img,
+.modal-dialog .qty-nav-thumb .slick-slide:hover img,
+.modal-dialog .qty-nav-thumb .slick-slide.slick-current img{
+  border-color: var(--primary) !important;
+}
+
+/* --- single product: title / price / rating --- */
+.single-pro-content .ec-single-title{ color: var(--text-heading) !important; }
+.single-pro-content .ec-single-desc,
+.single-pro-content p{ color: var(--text-body) !important; }
+.single-pro-content .ec-single-price span.new-price{ color: var(--primary) !important; }
+.single-pro-content .ec-single-rating{ border-color: var(--border-soft) !important; }
+.single-pro-content .ec-single-rating-wrap .ec-read-review a{ color: var(--text-heading) !important; }
+.single-pro-content .ec-single-rating-wrap .ec-read-review a:hover{ color: var(--primary) !important; }
+.single-pro-content .ec-single-price-stoke{ border-color: var(--border-soft) !important; }
+.single-pro-content .ec-single-price-stoke .ec-single-ps-title{ color: var(--text-muted) !important; }
+.single-pro-content .ec-single-price-stoke .ec-single-sku{ color: var(--text-heading) !important; }
+
+/* --- single product: sales/urgency box + countdown --- */
+.single-pro-content .ec-single-sales{
+  background-color: var(--bg-elevated) !important;
+  border-color: var(--border-soft) !important;
+}
+.single-pro-content .ec-single-sales .ec-single-sales-visitor{ color: var(--text-heading) !important; }
+.single-pro-content .ec-single-sales .ec-single-sales-visitor span{ background-color: var(--primary) !important; color: var(--text-on-gold) !important; }
+.single-pro-content .ec-single-sales .ec-single-sales-progress .ec-single-progressbar{ border-color: var(--border-soft) !important; }
+.single-pro-content .ec-single-sales .ec-single-sales-progress .ec-single-progressbar:before{ border-color: var(--primary) !important; }
+.single-pro-content .ec-single-sales .ec-single-progress-desc,
+.single-pro-content .ec-single-sales .ec-single-count-desc{ color: var(--text-muted) !important; }
+.ec-single-sales-countdown .displaySection{ background-color: var(--bg-secondary) !important; }
+.ec-single-sales-countdown .numberDisplay,
+.ec-single-sales-countdown .labelformat{ color: var(--text-heading) !important; }
+
+/* --- single product: color/size variation swatches --- */
+.ec-pro-variation .ec-pro-variation-inner > span,
+.single-pro-content .ec-pro-variation .ec-pro-variation-inner > span{ color: var(--text-heading) !important; }
+.ec-pro-variation .ec-pro-variation-inner.ec-pro-variation-color .ec-pro-variation-content li:hover,
+.ec-pro-variation .ec-pro-variation-inner.ec-pro-variation-color .ec-pro-variation-content li.active,
+.single-pro-content .ec-pro-variation .ec-pro-variation-inner.ec-pro-variation-color .ec-pro-variation-content .active{
+  border-color: var(--primary) !important;
+}
+.ec-pro-variation .ec-pro-variation-inner.ec-pro-variation-size .ec-pro-variation-content li,
+.ec-pro-size li a{
+  background-color: var(--secondary) !important;
+  color: var(--text-body) !important;
+}
+.ec-pro-variation .ec-pro-variation-inner.ec-pro-variation-size .ec-pro-variation-content li:hover,
+.ec-pro-variation .ec-pro-variation-inner.ec-pro-variation-size .ec-pro-variation-content .active,
+.ec-pro-size li.active a{
+  background-color: var(--primary) !important;
+  color: var(--text-on-gold) !important;
+}
+
+/* --- single product: quantity box + wishlist/compare buttons --- */
+.single-pro-content .ec-single-qty,
+.eccart-pro-items li .ec-pro-content .qty-plus-minus,
+.quickview-pro-content .ec-quickview-qty .qty-plus-minus{
+  border-color: var(--border-soft) !important;
+}
+.single-pro-content .ec-single-qty .qty-plus-minus{ border-color: var(--border-soft) !important; }
+.single-pro-content .ec-single-qty .qty-plus-minus input.qty-input,
+.single-pro-content .ec-single-qty .qty-plus-minus .ec_qtybtn,
+.eccart-pro-items li .ec-pro-content .qty-plus-minus input.qty-input{ color: var(--text-heading) !important; }
+.single-pro-content .ec-single-qty .qty-plus-minus .dec.ec_qtybtn,
+.single-pro-content .ec-single-qty .qty-plus-minus .inc.ec_qtybtn{ border-color: var(--border-soft) !important; }
+.single-pro-content .ec-single-qty .ec-btn-group{
+  background-color: var(--bg-elevated) !important;
+  border-color: var(--border-soft) !important;
+  color: var(--text-heading) !important;
+}
+.single-pro-content .ec-single-qty .ec-btn-group:hover{
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: var(--text-on-gold) !important;
+}
+.single-pro-content .ec-single-qty .ec-btn-group .svg_img.pro_svg{ fill: var(--text-heading) !important; }
+.single-pro-content .ec-single-qty .ec-btn-group:hover .svg_img.pro_svg{ fill: var(--text-on-gold) !important; }
+
+/* --- single product: description/reviews/more-info tabs --- */
+.ec-single-pro-tab-nav .nav-tabs .nav-link{
+  background-color: var(--bg-elevated) !important;
+  border-color: var(--border-soft) !important;
+  color: var(--text-body) !important;
+}
+.ec-single-pro-tab-nav .nav-tabs .nav-link:hover,
+.ec-single-pro-tab-nav .nav-tabs .nav-link.active{
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: var(--text-on-gold) !important;
+}
+.ec-single-pro-tab-content{ border-color: var(--border-soft) !important; color: var(--text-body) !important; }
+.ec-single-pro-tab-content .ec-single-pro-tab-desc p,
+.ec-single-pro-tab-content .ec-single-pro-tab-desc ol li,
+.ec-single-pro-tab-content .ec-single-pro-tab-desc ul li,
+.ec-single-pro-tab-content .ec-single-pro-tab-moreinfo p,
+.ec-single-pro-tab-content .ec-single-pro-tab-moreinfo li{ color: var(--text-body) !important; }
+.ec-single-pro-tab-content .ec-t-review-item{ border-color: var(--border-soft) !important; }
+.ec-single-pro-tab-content .ec-t-review-item .ec-t-review-top .ec-t-review-name,
+.ec-single-pro-tab-content .ec-t-review-item .ec-t-review-top a{ color: var(--text-heading) !important; }
+.ec-single-pro-tab-content .ec-t-review-item .ec-t-review-bottom p,
+.ec-single-pro-tab-content .ec-t-review-item p{ color: var(--text-body) !important; }
+.ec-single-pro-tab-content .ec-ratting-content h3{ color: var(--text-heading) !important; }
+.ec-single-pro-tab-content .ec-ratting-content .ec-ratting-star span{ color: var(--text-heading) !important; }
+.ec-single-pro-tab-content .ec-ratting-content .ec-ratting-input input,
+.ec-single-pro-tab-content .ec-ratting-content .ec-ratting-input textarea{
+  background-color: var(--bg-secondary) !important;
+  border-color: var(--border-soft) !important;
+  color: var(--text-body) !important;
+}
+
+/* --- sidebar product slider on single product page --- */
+.product_page .ec-sidebar-slider .ec-sb-pro-sl .ec-sb-pro-sl-item,
+.category-sidebar .cat-sidebar .ec-sb-pro-sl .ec-sb-pro-sl-item{
+  background-color: var(--surface-photo) !important;
+  border-color: var(--border-soft) !important;
+}
+.product_page .ec-sidebar-slider .ec-sb-pro-sl .ec-sb-pro-sl-item .ec-pro-content .ec-pro-title a,
+.product_page .ec-sb-slider-title{ color: var(--text-heading) !important; }
+.product_page .ec-sidebar-slider .ec-sb-pro-sl .ec-sb-pro-sl-item .ec-pro-content .ec-price span.new-price{ color: var(--primary) !important; }
+
+/* --- generic light "card" surfaces used across shop/vendor pages --- */
+.ec_map_canvas,
+.ec-page-description,
+.ec-trackorder-inner,
+.ec-login-wrapper .ec-login-container,
+.ec-register-wrapper .ec-register-container,
+.ec-contact-container,
+.checkout_page .ec-checkout-wrap,
+.ec-faq-wrapper .ec-faq-container,
+.ec-faq-block,
+h4.ec-faq-title,
+.ec-faq-content{
+  background-color: var(--bg-elevated) !important;
+  border-color: var(--border-soft) !important;
+  color: var(--text-body) !important;
+}

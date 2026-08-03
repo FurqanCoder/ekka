@@ -7,7 +7,7 @@ use Livewire\Component;
 
 class ViewOrder extends Component
 {
-     public Order $order;
+    public Order $order;
 
     public $status;
 
@@ -19,9 +19,27 @@ class ViewOrder extends Component
 
     public function updateStatus()
     {
-        $this->order->update([
-            'status' => $this->status
-        ]);
+        $updates = ['status' => $this->status];
+        $now = now();
+
+        if ($this->status === 'confirmed') {
+            $updates['confirmed_at'] = $now;
+        } elseif ($this->status === 'shipped') {
+            $updates['shipped_at'] = $now;
+            $updates['confirmed_at'] = $this->order->confirmed_at ?? $now;
+        } elseif ($this->status === 'delivered') {
+            $updates['delivered_at'] = $now;
+            $updates['shipped_at'] = $this->order->shipped_at ?? $now;
+            $updates['confirmed_at'] = $this->order->confirmed_at ?? $now;
+
+            if ($this->order->payment_method === 'cod') {
+                $updates['payment_status'] = 'paid';
+            }
+        }
+
+        $this->order->update($updates);
+        $this->order->refresh();
+        $this->status = $this->order->status;
 
         session()->flash('success', 'Order status updated.');
     }

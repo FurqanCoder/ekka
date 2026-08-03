@@ -16,8 +16,14 @@ class Order extends Model
         'subtotal', 'discount_amount', 'shipping_charges', 'tax_amount',
         'grand_total', 'total_items', 'currency',
         'status', 'customer_note', 'admin_note',
-        'invoice_no', 'invoice_date',
+        'invoice_no', 'invoice_date', 'confirmed_at', 'shipped_at', 'delivered_at',
         'is_refunded', 'refunded_amount'
+    ];
+
+    protected $casts = [
+        'confirmed_at' => 'datetime',
+        'shipped_at' => 'datetime',
+        'delivered_at' => 'datetime',
     ];
 
     // Relationships

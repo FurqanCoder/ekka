@@ -1,14 +1,16 @@
 <?php
 
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Livewire\Dashboard\Auth\LoginComponent;
+use App\Livewire\Dashboard\Auth\RegisterComponent;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
 Route::middleware('guest')->group(function () {
-    Volt::route('login', 'auth.login')
+    Route::get('login', LoginComponent::class)
         ->name('login');
 
-    Volt::route('register', 'auth.register')
+    Route::get('register', RegisterComponent::class)
         ->name('register');
 
     Volt::route('forgot-password', 'auth.forgot-password')

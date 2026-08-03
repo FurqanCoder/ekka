@@ -36,130 +36,100 @@
             font-size: 22px;
         }
 
-        /* FORCE ONE LINE ALWAYS  */
         .address-options-wrapper {
             display: flex;
             gap: 12px;
             width: 100%;
             flex-wrap: nowrap;
         }
+        
+        .address-card {
+            transition: all 0.3s ease;
+        }
+        
+        .address-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .address-card.selected {
+            border-color: #2563EB !important;
+            background: #EFF6FF !important;
+            box-shadow: 0 8px 20px rgba(37,99,235,0.12) !important;
+        }
     </style>
 
     <div class="tab-pane fade show active" id="shipping" role="tabpanel">
         @if ($addresses->count() > 0)
-            <div class="flex justify-between items-center">
-                <h3 class="text-lg font-semibold">Saved addresses</h3>
-                <button wire:click="showCreate" class="btn btn-primary">Add address</button>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="text-lg font-semibold">Saved Addresses</h3>
+                <button wire:click="showCreate" class="btn btn-primary btn-sm">
+                    <i class="fa-solid fa-plus me-1"></i> Add Address
+                </button>
             </div>
-            <div class="grid gap-3 mb-3"
-                style="
-                        width:98%;
-                        margin:0 auto;
-                        display:grid;
-                        justify-content:center;
-                        align-content:center
-                ">
+            
+            <div class="row g-3 mb-3">
                 @forelse($addresses as $addr)
-                    @php
-                        $isSelected = $selectedAddressId === $addr->id;
-                        // Base container styles
-                        $baseStyle =
-                            'position:relative; display:flex; justify-content:space-between; align-items:flex-start;' .
-                            'padding:16px; border-radius:12px; cursor:pointer; transition: all 0.18s ease;';
-                        // Selected vs unselected overrides
-                        $selectedStyle =
-                            'border:2px solid #2563EB; background:#EFF6FF; box-shadow:0 8px 20px rgba(37,99,235,0.12); transform:scale(1.02);';
-                        $unselectedStyle = 'border:1px solid #D1D5DB; background:#FFFFFF;';
-                        $containerStyle = $baseStyle . ($isSelected ? $selectedStyle : $unselectedStyle);
-                        // Small text styles
-                        $labelStyle = 'margin:0; font-weight:700; color:#111827;';
-                        $metaStyle = 'margin-top:6px; font-size:14px; color:#374151;';
-                        $subMetaStyle = 'margin-top:6px; font-size:13px; color:#6B7280;';
-                        // Button styles
-                        $btnBase =
-                            'padding:8px 12px; font-size:13px; border-radius:8px; border:1px solid transparent; cursor:pointer; transition:all 0.12s ease;';
-                        $btnDefault = $btnBase . 'background:#FFFFFF; color:#111827; border:1px solid #D1D5DB;';
-                        $btnSecondary = $btnBase . 'background:#F3F4F6; color:#111827; border:1px solid #e5e7eb;';
-                        $btnDanger = $btnBase . 'background:#EF4444; color:#FFFFFF; border:1px solid #EF4444;';
-                    @endphp
-
-                    <div wire:click="selectAddress({{ $addr->id }})" class=""
-                        wire:keydown.enter="selectAddress({{ $addr->id }})" role="button" tabindex="0"
-                        style="{{ $containerStyle }}" aria-pressed="{{ $isSelected ? 'true' : 'false' }}">
-                        {{-- SELECTED BADGE --}}
-                        @if ($isSelected)
-                            <div
-                                style="position:absolute; top:-10px; right:-10px; background:#2563EB; color:#FFFFFF;
-                        padding:6px 12px; border-radius:999px; font-size:12px; font-weight:600;
-                        box-shadow:0 6px 14px rgba(37,99,235,0.12);">
-                                Selected
+                    <div class="col-12">
+                        <div class="address-card border rounded-3 p-3 {{ $selectedAddressId === $addr->id ? 'selected' : '' }}"
+                             wire:click="selectAddress({{ $addr->id }})"
+                             style="cursor: pointer; transition: all 0.3s ease;">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <strong>{{ $addr->label ?? 'Address' }}</strong>
+                                        @if ($addr->is_default)
+                                            <span class="badge bg-success">Default</span>
+                                        @endif
+                                        @if ($selectedAddressId === $addr->id)
+                                            <span class="badge bg-primary">Selected</span>
+                                        @endif
+                                    </div>
+                                    <div class="text-muted small">{{ $addr->full_address }}</div>
+                                    <div class="text-muted small">{{ $addr->name }} — {{ $addr->phone }}</div>
+                                </div>
+                                <div class="d-flex gap-2 ms-2">
+                                    @if (!$addr->is_default)
+                                        <button wire:click.stop="setDefault({{ $addr->id }})" 
+                                                class="btn btn-sm btn-outline-secondary">
+                                            Set Default
+                                        </button>
+                                    @endif
+                                    <button wire:click.stop="edit({{ $addr->id }})" 
+                                            class="btn btn-sm btn-outline-primary">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </button>
+                                    <button wire:click.stop="deleteAddress({{ $addr->id }})" 
+                                            class="btn btn-sm btn-outline-danger"
+                                            onclick="return confirm('Delete this address?')">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
                             </div>
-                        @endif
-
-                        {{-- Left content --}}
-                        <div style="flex:1; min-width:0;">
-                            <div style="display:flex; align-items:center; gap:8px;">
-                                <p style="{{ $labelStyle }}">{{ $addr->label ?? 'Address' }}</p>
-
-                                @if ($addr->is_default)
-                                    <span
-                                        style="margin-left:6px; font-size:12px; padding:4px 8px; border-radius:8px;
-                                 background:#DCFCE7; color:#065F46; font-weight:600;">
-                                        Default
-                                    </span>
-                                @endif
-                            </div>
-
-                            <div style="{{ $metaStyle }}">{{ $addr->full_address }}</div>
-                            <div style="{{ $subMetaStyle }}">{{ $addr->name }} — {{ $addr->phone }}</div>
-                        </div>
-
-                        {{-- Right actions --}}
-                        <div style="display:flex; gap:8px; margin-left:16px; align-items:flex-start;">
-
-                            @if (!$addr->is_default)
-                                <button wire:click.stop="setDefault({{ $addr->id }})" type="button"
-                                    style="{{ $btnDefault }}" title="Set as default address">
-                                    Set default
-                                </button>
-                            @endif
-
-                            <button wire:click.stop="edit({{ $addr->id }})" type="button"
-                                style="{{ $btnSecondary }}" title="Edit address">
-                                Edit
-                            </button>
-
-                            <button wire:click.stop="deleteAddress({{ $addr->id }})" type="button"
-                                style="{{ $btnDanger }}"
-                                onclick="if(!confirm('Delete this address?')) event.stopImmediatePropagation();"
-                                title="Delete address">
-                                Delete
-                            </button>
                         </div>
                     </div>
                 @empty
-                    <p style="color:#6B7280; font-size:14px;">No addresses available.</p>
+                    <p class="text-muted">No addresses available.</p>
                 @endforelse
-
             </div>
-            <button class="btn btn-primary float-right mb-3" wire:click="gotoPayment">Proceed Now</button>
+            
+            <div class="d-flex justify-content-end mt-3">
+                <button class="btn btn-primary px-4" wire:click="gotoPayment">
+                    Proceed to Payment <i class="fa-solid fa-arrow-right ms-2"></i>
+                </button>
+            </div>
             <hr>
         @endif
 
-        <h5 class="mb-3">Shipping Information</h5>
-        <div class="address-options-wrapper">
-
-            <!-- Home -->
+        <h5 class="mb-3">Add New Shipping Address</h5>
+        <div class="address-options-wrapper mb-3">
             <div class="address-option">
-                <input type="radio" wire:model.defer="label" id="home" name="address_type" value="home"
-                    checked>
+                <input type="radio" wire:model.defer="label" id="home" name="address_type" value="home" checked>
                 <label for="home">
                     <span class="label-icon" style="font-size: large">🏠</span>
                     Home
                 </label>
             </div>
-
-            <!-- Office -->
             <div class="address-option">
                 <input type="radio" id="office" wire:model.defer="label" name="address_type" value="office">
                 <label for="office">
@@ -167,8 +137,6 @@
                     Office
                 </label>
             </div>
-
-            <!-- Other -->
             <div class="address-option">
                 <input type="radio" id="other" wire:model.defer="label" name="address_type" value="other">
                 <label for="other">
@@ -176,75 +144,80 @@
                     Other
                 </label>
             </div>
-
         </div>
-        <form id="shippingForm">
+        
+        <form id="shippingForm" wire:submit.prevent="save">
             <div class="row g-3">
                 <div class="col-md-6">
-                    <label class="form-label">Full Name</label>
-                    <input type="text" name="shipping_name" wire:model.defer="name" class="form-control"
+                    <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                    <input type="text" wire:model.defer="name" class="form-control @error('name') is-invalid @enderror"
                         placeholder="John Doe">
+                    @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Phone</label>
-                    <input type="text" name="shipping_phone" wire:model.defer="phone" class="form-control"
+                    <label class="form-label">Phone <span class="text-danger">*</span></label>
+                    <input type="text" wire:model.defer="phone" class="form-control @error('phone') is-invalid @enderror"
                         placeholder="0300 1234567">
+                    @error('phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Email Address</label>
-                    <input type="email" name="shipping_email" value="{{ auth()->user()->email }}" readonly
-                        class="form-control" placeholder="you@example.com">
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label">State</label>
-                    <select name="" id="" wire:model.defer="province" class="form-control border">
-                        <option value="Punjab" class="form-control">Punjab</option>
-                        <option value="Sindh" class="form-control">Sindh</option>
-                        <option value="KPK" class="form-control">KPK</option>
-                        <option value="Balochistan" class="form-control">Balochistan</option>
+                    <label class="form-label">Province/State</label>
+                    <select wire:model.defer="province" class="form-control">
+                        <option value="">Select Province</option>
+                        <option value="Punjab">Punjab</option>
+                        <option value="Sindh">Sindh</option>
+                        <option value="KPK">KPK</option>
+                        <option value="Balochistan">Balochistan</option>
+                        <option value="Gilgit-Baltistan">Gilgit-Baltistan</option>
+                        <option value="Azad Kashmir">Azad Kashmir</option>
                     </select>
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">City</label>
-                    <input type="text" wire:model.defer="city" name="shipping_city" class="form-control"
+                    <label class="form-label">City <span class="text-danger">*</span></label>
+                    <input type="text" wire:model.defer="city" class="form-control @error('city') is-invalid @enderror"
                         placeholder="City Name">
+                    @error('city') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Postal Code</label>
-                    <input type="text" wire:model.defer="postal_code" name="shipping_postal" class="form-control"
+                    <input type="text" wire:model.defer="postal_code" class="form-control"
                         placeholder="ZIP / Postal Code">
                 </div>
-                <div class="col-md-12">
-                    <label class="form-label">Street Address</label>
-                    <input type="text" wire:model.defer="address_line_1" name="shipping_address"
-                        class="form-control" placeholder="123 Example Street">
-                    <input type="text" wire:model.defer="address_line_2" name="shipping_address"
-                        class="form-control mt-2" placeholder="Address line 2 (optional)">
+                <div class="col-md-6">
+                    <label class="form-label">Country</label>
+                    <input type="text" wire:model.defer="country" class="form-control" placeholder="Pakistan">
+                </div>
+                <div class="col-12">
+                    <label class="form-label">Street Address <span class="text-danger">*</span></label>
+                    <input type="text" wire:model.defer="address_line_1" class="form-control @error('address_line_1') is-invalid @enderror"
+                        placeholder="123 Example Street">
+                    @error('address_line_1') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    <input type="text" wire:model.defer="address_line_2" class="form-control mt-2"
+                        placeholder="Address line 2 (optional)">
                 </div>
 
-
-                <div class="col-12 flex items-center gap-3 mt-2">
-                    <div class="form-check d-flex">
-                        <label class="inline-flex items-center">
-                            <input type="checkbox"
-                                style="width:16px; height:16px; transform: scale(1.3); margin-right:6px;"
-                                wire:model.defer="is_default" checked>
-                            <span class="text-sm">Set as default</span>
+                <div class="col-12">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="is_default" wire:model.defer="is_default">
+                        <label class="form-check-label" for="is_default">
+                            Set as default address
                         </label>
                     </div>
                 </div>
             </div>
         </form>
 
-        <div class="text-end mt-4">
-            <button type="button" wire:click="resetForm" class="btn btn-secondary">Cancel</button>
-            <button class="btn btn-primary px-5" type="submit" wire:click="save">
-                Save & Continue to Payment
+        <div class="d-flex gap-2 mt-4">
+            <button type="button" wire:click="resetForm" class="btn btn-secondary">
+                Cancel
             </button>
-
+            <button class="btn btn-primary px-5" wire:click="save">
+                <i class="fa-solid fa-save me-2"></i> Save Address
+            </button>
         </div>
+        
         @error('*')
-            <div class="text-red-600 text-sm">{{ $message }}</div>
+            <div class="text-danger text-sm mt-2">{{ $message }}</div>
         @enderror
     </div>
 </div>

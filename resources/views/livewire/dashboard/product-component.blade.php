@@ -133,7 +133,7 @@
                                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                     <li>
                                                         <a class="dropdown-item d-flex align-items-center gap-3"
-                                                            href="javascript:void(0) ">
+                                                            href="{{route('products.view', $product->id)}} ">
                                                             <iconify-icon icon="mdi:eye-outline" class="fs-5 btn btn-sm btn-info"></iconify-icon> View
                                                         </a>
                                                     </li>

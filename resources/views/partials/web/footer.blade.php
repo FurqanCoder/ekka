@@ -18,6 +18,7 @@
  <!-- Main Js -->
  <script src="{{ asset('web/js/vendor/index.js') }}"></script>
  <script src="{{ asset('web/js/main.js') }}"></script>
+ <script src="{{ asset('web/js/dark-mode-toggle.js') }}"></script>
  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
  <script>
      document.addEventListener('DOMContentLoaded', () => {

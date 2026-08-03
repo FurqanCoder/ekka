@@ -1,0 +1,633 @@
+/* =================================================================
+   CLOUD SKIN BEAUTY — THEME OVERRIDES
+   Requires tokens.css loaded first. Load this LAST, after every
+   existing stylesheet (demo1.css, style.css, responsive.css).
+   Everything here is additive/overriding — nothing is deleted from
+   the base template, so functionality is untouched.
+   ================================================================= */
+
+/* -----------------------------------------------------------------
+   0. GLOBAL BASE
+   ----------------------------------------------------------------- */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  transition: background-color var(--duration-base) var(--ease-standard),
+              color var(--duration-base) var(--ease-standard);
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+  font-family: var(--font-heading);
+  color: var(--color-text-primary);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-tight);
+}
+
+h1, .h1 { font-size: var(--fs-h1); }
+h2, .h2 { font-size: var(--fs-h2); }
+h3, .h3 { font-size: var(--fs-h3); }
+h4, .h4 { font-size: var(--fs-h4); }
+h5, .h5 { font-size: var(--fs-h5); }
+h6, .h6 { font-size: var(--fs-h6); }
+
+p, .ec-blog-detail p, .quickview-pro-content p {
+  color: var(--color-text-secondary);
+  line-height: var(--lh-normal);
+}
+
+a { color: var(--color-text-link); }
+a:hover { color: var(--color-text-link-hover); }
+
+::selection {
+  background: var(--color-primary-light);
+  color: var(--color-text-primary);
+}
+
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-track { background: var(--color-divider); }
+*::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: var(--radius-pill);
+}
+*::-webkit-scrollbar-thumb:hover { background: var(--color-text-muted); }
+
+/* Consistent, visible, on-brand focus ring everywhere (a11y) */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+.btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px var(--state-focus-ring);
+  border-radius: var(--radius-xs);
+}
+
+/* -----------------------------------------------------------------
+   1. SECTION / HEADER / FOOTER SURFACES
+   ----------------------------------------------------------------- */
+.modal-content,
+.ec-side-cart,
+.category-sidebar,
+.filter-sidebar,
+.ec-tools-sidebar {
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
+}
+
+/* Utility bar (social icons / promo line) — dark ink, echoes the
+   packaging's black, gives the header actual brand presence instead
+   of reading as plain white chrome. */
+.header-top {
+  background-color: var(--color-text-primary);
+  border-bottom: none;
+}
+.header-top-message,
+.header-top-message span,
+.header-top a,
+.header-top-lan-curr .dropdown .dropdown-toggle,
+.header-top-lan-curr .dropdown .dropdown-toggle i {
+  color: var(--color-text-on-dark);
+}
+.header-top-social ul li a {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: var(--color-text-on-dark);
+}
+.header-top-social ul li a:hover { color: var(--color-primary-contrast); }
+
+/* Main nav row stays a clean surface so the logo/search keep contrast,
+   but gets a visible bottom border instead of blending into the page. */
+.ec-header,
+.ec-header-bottom,
+.sticky-nav.menu_fixed,
+.sticky-nav.menu_fixed_up {
+  background-color: var(--color-surface);
+}
+.ec-header-bottom { border-bottom: 1px solid var(--color-divider); }
+.nav-tabs, .ec-breadcrumb { border-color: var(--color-divider) !important; }
+
+/* Footer — dark ink with a gold top border, matching the packaging's
+   black-and-gold identity instead of stock white. */
+.ec-footer {
+  background-color: var(--color-text-primary);
+  color: rgba(245, 241, 236, 0.75);
+  border-top: 3px solid var(--color-primary);
+}
+.ec-footer .footer-top { border-color: rgba(255, 255, 255, 0.1); }
+.footer-bottom {
+  background-color: var(--color-text-primary);
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+.footer-bottom .ec-copy { color: rgba(245, 241, 236, 0.7); }
+
+.ec-breadcrumb {
+  background-color: var(--color-card-alt);
+}
+.ec-breadcrumb .ec-breadcrumb-title,
+.ec-breadcrumb-list li a { color: var(--color-text-primary); }
+.ec-breadcrumb-list li.active,
+.ec-breadcrumb-list .ec-breadcrumb-item.active::before { color: var(--color-primary); }
+
+.ec-main-menu ul li a { color: var(--color-text-primary); }
+.ec-main-menu ul li:hover > a,
+.ec-main-menu ul li.active > a { color: var(--color-secondary) !important; }
+.ec-main-menu > ul > li:hover > a:before,
+.ec-main-menu > ul > li.active > a:before { background: var(--color-secondary); }
+
+.ec-footer .footer-top .ec-footer-widget .ec-footer-heading {
+  color: var(--color-text-on-dark);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+.ec-footer .footer-top .ec-footer-widget .ec-footer-links .ec-footer-link,
+.ec-footer .footer-top .ec-footer-widget .ec-footer-links .ec-footer-link span {
+  color: rgba(245, 241, 236, 0.65);
+}
+.ec-footer .footer-top .ec-footer-widget .ec-footer-links .ec-footer-link a {
+  color: rgba(245, 241, 236, 0.8);
+}
+.ec-footer .footer-top .ec-footer-widget .ec-footer-links .ec-footer-link a:hover {
+  color: var(--color-primary);
+}
+.footer-bottom .ec-copy .site-name { color: var(--color-primary); }
+.footer-offer { background: var(--gradient-ink); }
+div#ec_news_signup {
+  background-color: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+.ec-subscribe-form .ec-email { color: var(--color-text-on-dark); }
+.ec-subscribe-form .ec-email::placeholder { color: rgba(245, 241, 236, 0.55); }
+
+/* -----------------------------------------------------------------
+   2. BUTTONS
+   ----------------------------------------------------------------- */
+.btn {
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: var(--fs-button);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-wide);
+  transition: background-color var(--duration-fast) var(--ease-standard),
+              border-color var(--duration-fast) var(--ease-standard),
+              color var(--duration-fast) var(--ease-standard),
+              box-shadow var(--duration-fast) var(--ease-standard),
+              transform var(--duration-fast) var(--ease-standard);
+}
+.btn:active { transform: translateY(1px); }
+.btn:disabled,
+.btn.disabled {
+  background-color: var(--state-disabled-bg) !important;
+  border-color: var(--state-disabled-bg) !important;
+  color: var(--state-disabled-fg) !important;
+  cursor: not-allowed;
+}
+
+/* Primary = gold, ink text (contrast) */
+.btn-primary,
+.btn-check:checked + .btn-primary,
+.btn-check:active + .btn-primary,
+.show > .btn-primary.dropdown-toggle {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-primary-contrast);
+}
+.btn-primary:hover {
+  background-color: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+  color: var(--color-primary-contrast);
+  box-shadow: var(--shadow-gold);
+}
+.btn-primary:focus,
+.btn-primary:active {
+  background-color: var(--color-primary-active);
+  border-color: var(--color-primary-active);
+  color: var(--color-primary-contrast);
+}
+
+/* Secondary = dusty rose, white text */
+.btn-secondary,
+.btn-color-dark,
+.btn-hover-color-primary:hover {
+  background-color: var(--color-secondary);
+  border-color: var(--color-secondary);
+  color: var(--color-secondary-contrast);
+}
+.btn-secondary:hover { background-color: var(--color-secondary-hover); border-color: var(--color-secondary-hover); }
+.btn-secondary:active,
+.btn-secondary:focus { background-color: var(--color-secondary-active); border-color: var(--color-secondary-active); }
+
+.btn-outline-primary {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  background: transparent;
+}
+.btn-outline-primary:hover,
+.btn-outline-primary:active,
+.btn-outline-primary.active {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-primary-contrast);
+}
+
+.btn-success { background-color: var(--color-success); border-color: var(--color-success); }
+.btn-warning { background-color: var(--color-warning); border-color: var(--color-warning); color: #1A1614; }
+.btn-danger, .btn-outline-danger:hover { background-color: var(--color-error); border-color: var(--color-error); }
+.btn-info { background-color: var(--color-info); border-color: var(--color-info); }
+
+.btn-link { color: var(--color-secondary); }
+.btn-link:hover { color: var(--color-secondary-hover); }
+
+/* -----------------------------------------------------------------
+   3. FORMS — inputs / textarea / select
+   ----------------------------------------------------------------- */
+input,
+textarea,
+select,
+.form-control,
+.form-select,
+.header-search .form-control,
+.ec-select-inner select {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  transition: border-color var(--duration-fast) var(--ease-standard),
+              box-shadow var(--duration-fast) var(--ease-standard);
+}
+input::placeholder,
+textarea::placeholder,
+.form-control::placeholder { color: var(--color-text-muted); }
+
+input:hover, textarea:hover, select:hover,
+.form-control:hover, .form-select:hover {
+  border-color: var(--color-text-muted);
+}
+input:focus, textarea:focus, select:focus,
+.form-control:focus, .form-select:focus,
+.header-search .form-control:focus {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 4px var(--state-focus-ring) !important;
+  outline: none;
+}
+input:disabled, textarea:disabled, select:disabled,
+.form-control:disabled, .form-control[readonly] {
+  background-color: var(--state-disabled-bg);
+  color: var(--state-disabled-fg);
+}
+.form-control.is-invalid, input.is-invalid { border-color: var(--color-error) !important; }
+.form-control.is-valid, input.is-valid { border-color: var(--color-success) !important; }
+.invalid-feedback { color: var(--color-error); }
+.valid-feedback { color: var(--color-success); }
+
+label, .form-label, .col-form-label {
+  color: var(--color-text-primary);
+  font-weight: var(--fw-medium);
+}
+.form-text, .text-muted { color: var(--color-text-muted) !important; }
+
+/* Checkboxes / Radios / Switches (custom Bootstrap4 pattern already in markup) */
+.form-check-input,
+.ec-sidebar-block-item .checked {
+  border: 1px solid var(--color-border);
+  background-color: var(--color-card);
+}
+.form-check-input:checked,
+.ec-sidebar-block-item input:checked ~ .checked {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+.form-check-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px var(--state-focus-ring);
+}
+.ec-sidebar-block-item .checked::after { background: var(--color-primary); border-color: var(--color-primary); }
+
+.form-switch .form-check-input:checked {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* Color swatches (product variation) keep their own hue, only ring changes */
+.ec-pro-color li:hover,
+.ec-pro-color li.active,
+.ec-pro-variation-color .ec-pro-variation-content .active { box-shadow: 0 0 0 2px var(--color-primary); }
+
+/* -----------------------------------------------------------------
+   4. CARDS / PRODUCT CARDS / SIDEBAR PANELS
+   ----------------------------------------------------------------- */
+.card,
+.ec-sidebar-wrap,
+.ec-border-box,
+.ec-vendor-dashboard-card,
+.ec-login-wrapper .ec-login-container,
+.ec-register-wrapper .ec-register-container,
+.ec-contact-container,
+.ec-faq-wrapper .ec-faq-container,
+.ec-checkout-wrap,
+.ec-trackorder-inner,
+.terms_condition_page .ec-common-wrapper {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xs);
+}
+
+.card-header, .modal-header, .ec-sidebar-heading h1 {
+  background-color: var(--color-card-alt);
+  border-color: var(--color-divider);
+  color: var(--color-text-primary);
+}
+
+.ec-product-inner,
+.ec-product-ds, .ec-product-csc, .ec-product-fw, .ec-product-tp,
+.ec-product-lsc, .ec-product-swd, .ec-product-cbb, .ec-product-sup,
+.ec-product-sbtn, .ec-product-sdwn {
+  background-color: var(--color-card);
+  border-color: var(--color-border) !important;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: box-shadow var(--duration-base) var(--ease-standard),
+              transform var(--duration-base) var(--ease-standard);
+}
+.ec-product-inner:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+/* The base template sets .ec-pro-content padding to "0 0 0" horizontally
+   — fine when the card had no visible border, but now that cards have a
+   background/border/radius, text needs real inset padding. */
+.ec-product-inner .ec-pro-content {
+  padding: var(--space-4) var(--space-4) var(--space-5);
+}
+.ec-product-inner .ec-pro-image {
+  border-radius: 0; /* parent .ec-product-inner already clips corners */
+}
+.ec-product-inner .ec-pro-option {
+  margin-top: var(--space-2);
+  flex-wrap: wrap;
+  row-gap: var(--space-2);
+}
+
+.ec-pro-title a, .ec-title a { color: var(--color-text-primary); }
+.ec-pro-title a:hover, .ec-title a:hover { color: var(--color-secondary) !important; }
+.ec-price span.new-price, .ec-pro-content .ec-price span.new-price { color: var(--color-primary-active); font-weight: var(--fw-bold); }
+.ec-price span.old-price { color: var(--color-text-muted); }
+
+.ec-product-inner .ec-pro-image .ec-pro-actions .ec-btn-group,
+.ec-product-inner .ec-pro-image .add-to-cart,
+.ec-product-inner .ec-pro-image a.quickview {
+  background-color: var(--color-card);
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}
+.ec-product-inner .ec-pro-image .ec-pro-actions .ec-btn-group:hover,
+.ec-product-inner .ec-pro-image .add-to-cart:hover,
+.ec-product-inner .ec-pro-image a.quickview:hover {
+  background-color: var(--color-primary);
+  color: var(--color-primary-contrast);
+  box-shadow: none;
+}
+.ec-product-inner .ec-pro-image .flags { background-color: var(--color-secondary); }
+.ec-product-inner .ec-pro-image .percentage { background-color: var(--color-error); }
+
+/* -----------------------------------------------------------------
+   5. NAVIGATION — tabs / pills / dropdowns
+   ----------------------------------------------------------------- */
+.nav-tabs .nav-link.active,
+.nav-tabs .nav-item.show .nav-link {
+  color: var(--color-primary-active);
+  background-color: var(--color-card);
+  border-color: var(--color-divider) var(--color-divider) var(--color-card);
+}
+.ec-pro-tab-nav .nav-item .nav-link.active,
+.ec-pro-tab-nav .nav-item .nav-link:hover { color: var(--color-secondary); }
+.ec-pro-tab-nav .nav-item .nav-link.active:before,
+.ec-pro-tab-nav .nav-item .nav-link:hover:before { background: var(--color-secondary); }
+
+.ec-single-pro-tab-nav .nav-tabs .nav-link {
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+  background: var(--color-card);
+}
+.ec-single-pro-tab-nav .nav-tabs .nav-link:hover,
+.ec-single-pro-tab-nav .nav-tabs .nav-link.active {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-primary-contrast);
+}
+
+.dropdown-menu {
+  background-color: var(--color-card);
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-md);
+}
+.dropdown-item { color: var(--color-text-primary); }
+.dropdown-item:hover, .dropdown-item:focus { background-color: var(--color-card-alt); color: var(--color-text-primary); }
+.dropdown-item.active, .dropdown-item:active { background-color: var(--color-primary); color: var(--color-primary-contrast); }
+
+/* FAQ / accordion */
+h4.ec-faq-title { background-color: var(--color-card-alt); color: var(--color-text-primary); }
+.ec-faq-content { border-color: var(--color-divider); }
+.ec-faq-block { box-shadow: var(--shadow-xs); }
+
+/* -----------------------------------------------------------------
+   6. BADGES / ALERTS / TOASTS
+   ----------------------------------------------------------------- */
+.badge { border-radius: var(--radius-pill); font-weight: var(--fw-semibold); }
+.bg-primary, .badge.bg-primary { background-color: var(--color-primary) !important; color: var(--color-primary-contrast) !important; }
+.bg-secondary, .badge.bg-secondary { background-color: var(--color-secondary) !important; color: #fff !important; }
+.bg-success { background-color: var(--color-success) !important; }
+.bg-warning { background-color: var(--color-warning) !important; color: #1A1614 !important; }
+.bg-danger  { background-color: var(--color-error) !important; }
+.bg-info    { background-color: var(--color-info) !important; }
+
+.alert { border-radius: var(--radius-md); border-width: 1px; }
+.alert-primary { background-color: var(--color-primary-light); border-color: var(--color-primary); color: #5C4813; }
+.alert-success { background-color: var(--color-success-light); border-color: var(--color-success); color: #2E4A37; }
+.alert-warning { background-color: var(--color-warning-light); border-color: var(--color-warning); color: #6B4A16; }
+.alert-danger  { background-color: var(--color-error-light); border-color: var(--color-error); color: #6E2429; }
+.alert-info    { background-color: var(--color-info-light); border-color: var(--color-info); color: #33475C; }
+
+.toast {
+  background-color: var(--color-card);
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-lg);
+  border-radius: var(--radius-md);
+}
+.toast-header { background-color: var(--color-card-alt); color: var(--color-text-secondary); border-color: var(--color-divider); }
+
+#addtocart_toast, #wishlist_toast {
+  background-color: var(--color-success);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+}
+
+/* -----------------------------------------------------------------
+   7. MODAL / TOOLTIP / POPOVER
+   ----------------------------------------------------------------- */
+.modal-content { border-radius: var(--radius-lg); border: 1px solid var(--color-border); box-shadow: var(--shadow-lg); }
+.modal-backdrop { background-color: var(--color-overlay); }
+.modal-header, .modal-footer { border-color: var(--color-divider); }
+
+.tooltip-inner { background-color: var(--color-text-primary); color: var(--color-text-on-dark); border-radius: var(--radius-xs); }
+.bs-tooltip-top .tooltip-arrow::before { border-top-color: var(--color-text-primary); }
+.bs-tooltip-bottom .tooltip-arrow::before { border-bottom-color: var(--color-text-primary); }
+
+.popover { background-color: var(--color-card); border-color: var(--color-border); box-shadow: var(--shadow-md); }
+.popover-header { background-color: var(--color-card-alt); border-color: var(--color-divider); }
+.popover-body { color: var(--color-text-secondary); }
+
+/* -----------------------------------------------------------------
+   8. TABLES / PAGINATION / BREADCRUMB
+   ----------------------------------------------------------------- */
+table, .ec-table, .ec-cart-content .table-content table, .ec-compare-table .table {
+  background-color: var(--color-card);
+}
+thead tr, .ec-cart-content .table-content table thead > tr {
+  background-color: var(--color-card-alt);
+}
+thead th, .ec-cart-content .table-content table thead > tr > th {
+  color: var(--color-text-primary);
+  border-color: var(--color-divider) !important;
+}
+tbody tr, .ec-cart-content .table-content table tbody > tr {
+  border-color: var(--color-divider) !important;
+}
+tbody td, .ec-cart-content .table-content table tbody > tr td {
+  color: var(--color-text-secondary);
+  border-color: var(--color-divider) !important;
+}
+
+.page-link {
+  background-color: var(--color-card);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+  border-radius: var(--radius-xs);
+}
+.page-link:hover { background-color: var(--color-card-alt); color: var(--color-secondary); }
+.page-item.active .page-link { background-color: var(--color-primary); border-color: var(--color-primary); color: var(--color-primary-contrast); }
+.page-item.disabled .page-link { background-color: var(--color-card); color: var(--color-text-disabled); }
+
+.ec-pro-pagination { border-color: var(--color-divider); }
+.ec-pro-pagination a.active, .ec-pro-pagination a:hover { background-color: var(--color-primary); color: var(--color-primary-contrast); }
+
+/* -----------------------------------------------------------------
+   9. PROGRESS / SPINNERS / LOADING
+   ----------------------------------------------------------------- */
+.progress { background-color: var(--color-divider); border-radius: var(--radius-pill); }
+.progress-bar { background-color: var(--color-primary); }
+
+.spinner-border, .spinner-grow { color: var(--color-primary); }
+#ec-overlay { background: var(--color-background); }
+#ec-overlay .ec-ellipsis div:nth-child(1),
+#ec-overlay .ec-ellipsis div:nth-child(3) { background: var(--color-primary); }
+#ec-overlay .ec-ellipsis div:nth-child(2),
+#ec-overlay .ec-ellipsis div:nth-child(4) { background: var(--color-secondary); }
+
+.ec-pro-loader { background: var(--color-primary); }
+
+/* -----------------------------------------------------------------
+   10. NEW: SKELETON LOADERS (not present in base template)
+   Usage: <div class="skeleton skeleton-img"></div>
+          <div class="skeleton skeleton-text"></div>
+   ----------------------------------------------------------------- */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-divider);
+  border-radius: var(--radius-sm);
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.55) 50%,
+    transparent 100%
+  );
+  animation: skeleton-shimmer 1.4s infinite;
+}
+[data-theme="dark"] .skeleton::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 100%
+  );
+}
+@keyframes skeleton-shimmer {
+  100% { transform: translateX(100%); }
+}
+.skeleton-text { height: 12px; margin-bottom: var(--space-2); width: 100%; }
+.skeleton-text.w-60 { width: 60%; }
+.skeleton-text.w-40 { width: 40%; }
+.skeleton-img { width: 100%; padding-top: 100%; /* square */ border-radius: var(--radius-md); }
+.skeleton-avatar { width: 48px; height: 48px; border-radius: var(--radius-circle); }
+
+/* -----------------------------------------------------------------
+   11. NEW: EMPTY STATES (not present in base template)
+   Usage:
+   <div class="ec-empty-state">
+     <div class="ec-empty-state__icon">…svg/icon…</div>
+     <h3 class="ec-empty-state__title">Your cart is empty</h3>
+     <p class="ec-empty-state__desc">…</p>
+     <a class="btn btn-primary ec-empty-state__cta">Continue shopping</a>
+   </div>
+   ----------------------------------------------------------------- */
+.ec-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-11) var(--space-6);
+  gap: var(--space-3);
+}
+.ec-empty-state__icon {
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-circle);
+  background-color: var(--color-primary-light);
+  color: var(--color-primary-active);
+  font-size: 32px;
+  margin-bottom: var(--space-2);
+}
+.ec-empty-state__title { margin: 0; color: var(--color-text-primary); }
+.ec-empty-state__desc { max-width: 420px; color: var(--color-text-muted); margin: 0 0 var(--space-4); }
+
+.emp-wishlist-msg { color: var(--color-text-muted); }
+
+/* -----------------------------------------------------------------
+   12. MISC — links, borders, badges on offers, dark-surface sections
+   ----------------------------------------------------------------- */
+.footer-offer, .ec-offer-section, .main-block { background-color: var(--color-text-primary); }
+.section-title .ec-title { color: var(--color-text-primary); }
+.section-title .ec-title:before, .section-title .ec-title:after { background: var(--color-primary); }
+.section-title .sub-title a { color: var(--color-secondary); }
+
+.border, .border-top, .border-bottom, .border-left, .border-right { border-color: var(--color-divider) !important; }
+
+/* Countdown / sale blocks reuse gold + ink instead of blue */
+.ec-single-sales-countdown .displaySection { background-color: var(--color-card-alt); }
+.numberDisplay { color: var(--color-text-primary); }
+.single-pro-content .ec-single-sales .ec-single-sales-visitor span { background-color: var(--color-primary); color: var(--color-primary-contrast); }
+
+/* Rating stars stay warm-gold instead of default yellow */
+.ec-rating .fill, i.ecicon.eci-star.fill, i.ecicon.eci-star-o.fill { color: var(--color-primary); }
+
+/* Scroll-to-top / floating buttons */
+#scrollUp { background-color: var(--color-text-primary); color: var(--color-text-on-dark); }
+#scrollUp:hover { background-color: var(--color-primary); color: var(--color-primary-contrast); }

@@ -34,7 +34,8 @@
                         <div class="ec-compare-inner">
                             <div class="row margin-minus-b-30">
                                 @forelse ($products as $product)
-                                    <x-product-card :product="$product" />
+                                    <x-product-card :product="$product" :showActions="true" add-cart-method="addToCart"
+                                        wish-method="toggleWishlist" quick-view-method="showQuickView" />
                                 @empty
                                     <p class="text-center">No item in Wish list</p>
                                 @endforelse
@@ -47,4 +48,6 @@
             </div>
         </div>
     </section>
+    @livewire('web.components.quick-view-modal')
+
 </div>

@@ -75,24 +75,29 @@ class CartComponent extends Component
     }
     public function incrementQty($productId, $variantId = null)
     {
+        $this->loadCart();
+
         foreach ($this->cart as $index => $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+
             if (
-                $item['product_id'] == $productId &&
-                ($variantId === null || $item['variant_id'] == $variantId)
+                ($item['product_id'] ?? null) == $productId &&
+                ($variantId === null || ($item['variant_id'] ?? null) == $variantId)
             ) {
-                $newQty = $this->cart[$index]['quantity'] + 1;
+                $currentQty = (int) ($this->cart[$index]['quantity'] ?? 0);
+                $newQty = $currentQty + 1;
 
                 $cartService = app(CartService::class);
                 $result = $cartService->updateQuantity($productId, $variantId, $newQty);
                 $this->dispatch('toast', [
-                    'message' => $result['message'],
-                    'type'    => $result['status'],
+                    'message' => $result['message'] ?? 'Cart updated successfully.',
+                    'type'    => $result['status'] ?? 'success',
                 ]);
-                // update local cart array
-                $this->cart[$index]['quantity'] = $newQty;
 
-                // recalc subtotal immediately
-                $this->subtotal = collect($this->cart)->sum(fn($i) => $i['price'] * $i['quantity']);
+                $this->cart[$index]['quantity'] = $newQty;
+                $this->subtotal = collect($this->cart)->sum(fn($i) => ((float) ($i['price'] ?? 0)) * (int) ($i['quantity'] ?? 0));
                 $this->dispatch('cart-updated');
 
                 break;
@@ -102,25 +107,31 @@ class CartComponent extends Component
 
     public function decrementQty($productId, $variantId = null)
     {
+        $this->loadCart();
+
         foreach ($this->cart as $index => $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+
             if (
-                $item['product_id'] == $productId &&
-                ($variantId === null || $item['variant_id'] == $variantId)
+                ($item['product_id'] ?? null) == $productId &&
+                ($variantId === null || ($item['variant_id'] ?? null) == $variantId)
             ) {
-                if ($this->cart[$index]['quantity'] > 1) {
-                    $newQty = $this->cart[$index]['quantity'] - 1;
+                $currentQty = (int) ($this->cart[$index]['quantity'] ?? 0);
+
+                if ($currentQty > 1) {
+                    $newQty = $currentQty - 1;
 
                     $cartService = app(CartService::class);
                     $result = $cartService->updateQuantity($productId, $variantId, $newQty);
                     $this->dispatch('toast', [
-                        'message' => $result['message'],
-                        'type'    => $result['status'],
+                        'message' => $result['message'] ?? 'Cart updated successfully.',
+                        'type'    => $result['status'] ?? 'success',
                     ]);
-                    // update local cart array
-                    $this->cart[$index]['quantity'] = $newQty;
 
-                    // recalc subtotal immediately
-                    $this->subtotal = collect($this->cart)->sum(fn($i) => $i['price'] * $i['quantity']);
+                    $this->cart[$index]['quantity'] = $newQty;
+                    $this->subtotal = collect($this->cart)->sum(fn($i) => ((float) ($i['price'] ?? 0)) * (int) ($i['quantity'] ?? 0));
                     $this->dispatch('cart-updated');
                 }
                 break;

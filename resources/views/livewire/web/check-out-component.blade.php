@@ -1,6 +1,6 @@
 <div>
     <!-- Ec breadcrumb start -->
-    <div class="sticky-header-next-sec  ec-breadcrumb section-space-mb">
+    <div class="sticky-header-next-sec ec-breadcrumb section-space-mb">
         <div class="container">
             <div class="row">
                 <div class="col-12">
@@ -9,12 +9,10 @@
                             <h2 class="ec-breadcrumb-title">Checkout</h2>
                         </div>
                         <div class="col-md-6 col-sm-12">
-                            <!-- ec-breadcrumb-list start -->
                             <ul class="ec-breadcrumb-list">
-                                <li class="ec-breadcrumb-item"><a href="index.html">Home</a></li>
+                                <li class="ec-breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
                                 <li class="ec-breadcrumb-item active">Checkout</li>
                             </ul>
-                            <!-- ec-breadcrumb-list end -->
                         </div>
                     </div>
                 </div>
@@ -26,128 +24,153 @@
         <div class="container">
             <div class="row">
                 <!-- Left: Checkout Steps -->
-                <div class="ec-checkout-leftside col-lg-8 col-md-12 ">
-                    <div class="checkout-steps p-4 bg-white border">
+                <div class="ec-checkout-leftside col-lg-8 col-md-12">
+                    <div class="checkout-steps p-4 bg-white border rounded-4">
                         <!-- Step Tabs -->
                         <ul class="nav nav-tabs mb-4" id="checkoutTabs" role="tablist">
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link {{ $activeTab == 'shipping' ? 'active' : '' }}"
-                                    id="shipping-tab" wire:click="tabShow('shipping')">Shipping</button>
+                                    wire:click="tabShow('shipping')">
+                                    <i class="fa-solid fa-truck me-1"></i> Shipping
+                                </button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button
-                                    class="nav-link {{ $activeTab == 'payment' ? 'active' : '' }} {{ !session('activeAddress') ? 'disabled' : '' }}"
-                                    id="payment-tab"
-                                    @if (session('activeAddress')) wire:click="tabShow('payment')" @else title="Select address first" @endif>Payment</button>
+                                <button class="nav-link {{ $activeTab == 'payment' ? 'active' : '' }} {{ !session('activeAddress') ? 'disabled' : '' }}"
+                                    wire:click="{{ session('activeAddress') ? 'tabShow(\'payment\')' : '' }}"
+                                    {{ !session('activeAddress') ? 'disabled' : '' }}>
+                                    <i class="fa-solid fa-credit-card me-1"></i> Payment
+                                </button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button
-                                    class="nav-link {{ $activeTab == 'review' ? 'active' : '' }} {{ !(session('activeAddress') && (session('pay_method') || $payment_method)) ? 'disabled' : '' }}"
-                                    id="review-tab"
-                                    @if (session('activeAddress') && (session('pay_method') || $payment_method)) wire:click="tabShow('review')" @else title="Complete previous steps" @endif>Review</button>
+                                <button class="nav-link {{ $activeTab == 'review' ? 'active' : '' }} {{ !(session('activeAddress')) ? 'disabled' : '' }}"
+                                    wire:click="{{ session('activeAddress') ? 'tabShow(\'review\')' : '' }}"
+                                    {{ !session('activeAddress') ? 'disabled' : '' }}>
+                                    <i class="fa-solid fa-check-circle me-1"></i> Review
+                                </button>
                             </li>
                         </ul>
 
                         <div class="tab-content" id="checkoutTabsContent">
                             <!-- Shipping Tab -->
-                            @switch($activeTab)
-                                @case('shipping')
+                            @if($activeTab == 'shipping')
+                                <div class="tab-pane fade show active">
                                     @livewire('web.components.address-manager')
-                                @break
+                                </div>
+                            @endif
 
-                                @case('payment')
-                                    <div>
-                                        <h4 class="font-semibold mb-3">Select Payment Method</h4>
-
-                                        @foreach ($paymentMethods as $method)
-                                            <label class="block mb-3 cursor-pointer">
-                                                <input type="radio" name="payment_method" value="{{ $method['key'] }}"
-                                                    wire:model="payment_method"
-                                                    @if (isset($method['disabled']) && $method['disabled']) disabled @endif />
-                                                <span class="ml-2 font-medium">{{ $method['name'] }}</span>
-                                                <p class="ml-6 text-sm text-gray-500">{{ $method['description'] }}</p>
-                                            </label>
-                                        @endforeach
-
-                                        @error('payment_method')
-                                            <p class="text-red-500 text-sm">{{ $message }}</p>
-                                        @enderror
-
-                                        <div class="d-flex justify-content-between mt-4">
-                                            <button class="btn btn-outline-primary px-4"
-                                                wire:click="tabShow('shipping')">Back</button>
-                                            <button class="btn btn-primary px-5" wire:click="goToReview">Review Order</button>
-                                        </div>
-                                    </div>
-                                @break
-
-                                @case('review')
-                                    <div id="review">
-                                        <h5 class="mb-3">Review & Confirm</h5>
-
-                                        <div class="border rounded p-3 mb-4">
-                                            <p class="mb-1">
-                                                <strong>Shipping:</strong>
-                                                @if ($address)
-                                                    {{ $address->name }} — {{ $address->phone }}<br>
-                                                    {{ $address->full_address }}
-                                                @else
-                                                    <em>No shipping address selected</em>
-                                                @endif
-                                            </p>
-
-                                            <p class="mb-1"><strong>Payment:</strong>
-                                                {{ $activePayment ?? session('pay_method') }}</p>
-
-                                            <p class="mb-1"><strong>Sub-Total:</strong> Rs. {{ number_format($subtotal, 2) }}
-                                            </p>
-                                            <p class="mb-1"><strong>Shipping:</strong> Rs.
-                                                {{ number_format($shippingCost, 2) }}</p>
-                                            @if (session('applied_coupon.discount'))
-                                                <p class="mb-1"><strong>Discount:</strong> - Rs.
-                                                    {{ number_format(session('applied_coupon.discount'), 2) }}</p>
-                                            @endif
-                                            <p class="mb-0"><strong>Total:</strong> <span
-                                                    class="text-primary">{{ 'Rs.' . number_format($total, 2) }}</span></p>
-                                        </div>
-
-                                        <!-- order items -->
-                                        <div class="mb-3">
-                                            <h6>Items</h6>
-                                            @foreach ($cart as $item)
-                                                <div class="d-flex justify-content-between mb-2">
-                                                    <div>
-                                                        <strong>{{ $item['name'] }}</strong>
-                                                        @if ($item['variant_options'])
-                                                            <div class="text-muted small">{{ $item['variant_options'] }}</div>
-                                                        @endif
-                                                        <div class="small text-muted">Qty: {{ $item['qty'] }}</div>
-                                                    </div>
-                                                    <div>Rs. {{ number_format($item['price'] * $item['qty'], 2) }}</div>
+                            <!-- Payment Tab -->
+                            @if($activeTab == 'payment')
+                                <div class="tab-pane fade show active">
+                                    <h4 class="fw-bold mb-3">Select Payment Method</h4>
+                                    
+                                    <div class="payment-method-selected">
+                                        <div class="alert alert-info p-4">
+                                            <div class="d-flex align-items-center gap-3">
+                                                <i class="fa-solid fa-hand-holding-dollar fa-2x"></i>
+                                                <div>
+                                                    <h5 class="fw-bold mb-1">Cash on Delivery</h5>
+                                                    <p class="mb-0">Pay when your order arrives at your doorstep.</p>
                                                 </div>
-                                            @endforeach
-                                        </div>
-
-                                        <div class="text-center mt-4">
-                                            <button class="btn btn-success px-5 py-2" wire:click="placeOrder"
-                                                wire:loading.attr="disabled" wire:target="placeOrder"
-                                                @if ($placing) disabled @endif>
-                                                <i class="bi bi-lock-fill me-2"></i>
-                                                <span wire:loading.remove wire:target="placeOrder">Place Order Securely</span>
-                                                <span wire:loading wire:target="placeOrder">Placing...</span>
-                                            </button>
-                                        </div>
-
-                                        <div class="text-center mt-3">
-                                            <small class="text-muted">🔒 100% Secure Checkout • 💳 SSL Encrypted • 🛡️
-                                                Money-Back Guarantee</small>
+                                            </div>
                                         </div>
                                     </div>
-                                @break
 
-                            @endswitch
+                                    <input type="hidden" wire:model="payment_method" value="cod">
+                                    
+                                    <div class="d-flex justify-content-between mt-4">
+                                        <button class="btn btn-outline-primary px-4" wire:click="tabShow('shipping')">
+                                            <i class="fa-solid fa-arrow-left me-2"></i> Back
+                                        </button>
+                                        <button class="btn btn-primary px-5" wire:click="goToReview">
+                                            Review Order <i class="fa-solid fa-arrow-right ms-2"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            @endif
 
-                            <button wire:click="thanks" class="d-none">thanks</button>
+                            <!-- Review Tab -->
+                            @if($activeTab == 'review')
+                                <div class="tab-pane fade show active" id="review">
+                                    <h5 class="fw-bold mb-3">Review & Confirm</h5>
+
+                                    <div class="border rounded-3 p-4 mb-4">
+                                        <h6 class="fw-bold mb-2">Shipping Address</h6>
+                                        @if ($address)
+                                            <p class="mb-1"><strong>{{ $address->name }}</strong></p>
+                                            <p class="mb-1">{{ $address->phone }}</p>
+                                            <p class="mb-1">{{ $address->full_address }}</p>
+                                        @else
+                                            <p class="text-danger">No shipping address selected</p>
+                                        @endif
+                                    </div>
+
+                                    <div class="border rounded-3 p-4 mb-4">
+                                        <h6 class="fw-bold mb-2">Payment Method</h6>
+                                        <p class="mb-0"><strong>Cash on Delivery</strong></p>
+                                    </div>
+
+                                    <div class="border rounded-3 p-4 mb-4">
+                                        <h6 class="fw-bold mb-2">Order Summary</h6>
+                                        <div class="d-flex justify-content-between py-1">
+                                            <span>Sub-Total</span>
+                                            <span>Rs. {{ number_format($subtotal, 0) }}</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between py-1">
+                                            <span>Shipping</span>
+                                            <span>Rs. {{ number_format($shippingCost, 0) }}</span>
+                                        </div>
+                                        @if (session('applied_coupon.discount'))
+                                            <div class="d-flex justify-content-between py-1 text-success">
+                                                <span>Discount</span>
+                                                <span>- Rs. {{ number_format(session('applied_coupon.discount'), 0) }}</span>
+                                            </div>
+                                        @endif
+                                        <div class="d-flex justify-content-between py-2 border-top mt-2">
+                                            <span class="fw-bold">Total</span>
+                                            <span class="fw-bold text-primary fs-5">Rs. {{ number_format($total, 0) }}</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Order Items -->
+                                    <div class="border rounded-3 p-4 mb-4">
+                                        <h6 class="fw-bold mb-2">Items ({{ count($cart) }})</h6>
+                                        @foreach ($cart as $item)
+                                            <div class="d-flex justify-content-between py-2 border-bottom">
+                                                <div>
+                                                    <strong>{{ $item['name'] }}</strong>
+                                                    @if ($item['variant_options'])
+                                                        <div class="text-muted small">{{ $item['variant_options'] }}</div>
+                                                    @endif
+                                                    <div class="text-muted small">Qty: {{ $item['qty'] }}</div>
+                                                </div>
+                                                <div class="fw-bold">Rs. {{ number_format($item['price'] * $item['qty'], 0) }}</div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+
+                                    <div class="text-center mt-4">
+                                        <button class="btn btn-success px-5 py-3 fw-bold" 
+                                                wire:click="placeOrder"
+                                                wire:loading.attr="disabled"
+                                                @if($placing) disabled @endif>
+                                            <i class="fa-solid fa-lock me-2"></i>
+                                            <span wire:loading.remove>Place Order Securely</span>
+                                            <span wire:loading>Placing...</span>
+                                        </button>
+                                        <div class="mt-3">
+                                            <small class="text-muted">
+                                                🔒 100% Secure Checkout • 💳 SSL Encrypted • 🛡️ Money-Back Guarantee
+                                            </small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="text-center mt-3">
+                                        <button class="btn btn-outline-secondary btn-sm" wire:click="tabShow('payment')">
+                                            <i class="fa-solid fa-arrow-left me-1"></i> Back to Payment
+                                        </button>
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -155,69 +178,65 @@
                 <!-- Sidebar Area Start -->
                 <div class="ec-checkout-rightside col-lg-4 col-md-12">
                     <div class="ec-sidebar-wrap">
-                        <!-- Sidebar Summary Block -->
                         <div class="ec-sidebar-block">
                             <div class="ec-sb-title">
-                                <h3 class="ec-sidebar-title">Summary</h3>
+                                <h3 class="ec-sidebar-title">Order Summary</h3>
                             </div>
                             <div class="ec-sb-block-content">
                                 <div class="ec-checkout-summary mb-3">
                                     <div class="d-flex justify-content-between">
                                         <span>Sub-Total</span>
-                                        <span>Rs. {{ number_format($subtotal, 2) }}</span>
+                                        <span>Rs. {{ number_format($subtotal, 0) }}</span>
                                     </div>
                                     <div class="d-flex justify-content-between">
                                         <span>Delivery Charges</span>
-                                        <span>Rs. {{ number_format($shippingCost, 2) }}</span>
+                                        <span>Rs. {{ number_format($shippingCost, 0) }}</span>
                                     </div>
 
                                     @livewire('web.components.cart-coupon-component')
 
-                                    <div class="ec-checkout-summary-total mt-3 d-flex justify-content-between">
+                                    <div class="ec-checkout-summary-total mt-3 pt-2 border-top d-flex justify-content-between">
                                         <span><strong>Total Amount</strong></span>
-                                        <span><strong>Rs. {{ number_format($total, 2) }}</strong></span>
+                                        <span><strong class="text-primary">Rs. {{ number_format($total, 0) }}</strong></span>
                                     </div>
                                 </div>
 
                                 <div class="ec-checkout-pro">
                                     @forelse ($cart as $item)
                                         @php
-                                            $product = $item['product'];
-                                            $img = optional($product->media->first());
-                                            $name = $product->name ?? 'Unknown product';
+                                            $img = $item['image'] ?? null;
+                                            $name = $item['name'] ?? 'Unknown product';
                                             $price = $item['price'] ?? 0;
                                         @endphp
-                                        <div class="col-sm-12 mb-3 d-flex align-items-center">
-                                            <div
-                                                style="width:64px; height:64px; overflow:hidden; border-radius:8px; margin-right:12px;">
-                                                <img src="{{ $img?->file_path ?? asset('images/placeholder.png') }}"
+                                        <div class="d-flex align-items-center gap-3 mb-3">
+                                            <div style="width:60px; height:60px; overflow:hidden; border-radius:8px; flex-shrink:0;">
+                                                <img src="{{ $img ?? asset('web/images/placeholder.jpg') }}"
                                                     style="width:100%;height:100%;object-fit:cover;"
                                                     alt="{{ $name }}">
                                             </div>
                                             <div style="flex:1;">
-                                                <h6 class="mb-0">{{ $name }}</h6>
+                                                <h6 class="mb-0">{{ Str::limit($name, 30) }}</h6>
                                                 <small class="text-muted">Qty. {{ $item['qty'] }}</small>
                                             </div>
-                                            <div>Rs. {{ number_format($price * $item['qty'], 2) }}</div>
+                                            <div class="fw-bold">Rs. {{ number_format($price * $item['qty'], 0) }}</div>
                                         </div>
                                     @empty
-                                        <p class="text-muted">No items in cart.</p>
+                                        <p class="text-muted text-center">No items in cart.</p>
                                     @endforelse
                                 </div>
                             </div>
                         </div>
-                        <!-- Sidebar Summary Block -->
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Thank You Modal (triggered from Livewire) -->
+    <!-- Thank You Modal -->
     <div class="modal fade" id="orderConfirmationModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 rounded-4 shadow-lg">
-                <div class="modal-body text-center p-5" style="background-color: #ffffff;">
+                <div class="modal-body text-center p-5">
                     <button type="button" class="btn-close position-absolute top-0 end-0 m-3"
                         data-bs-dismiss="modal" aria-label="Close"></button>
 
@@ -231,22 +250,16 @@
                     </div>
 
                     <h2 class="fw-bold mb-2" style="color:#111; font-size:1.75rem;">Thank You!</h2>
+                    <p class="text-muted mb-4">Your order has been successfully placed. You will receive an email confirmation shortly.</p>
 
-                    <p class="text-muted mb-4" style="font-size:1rem;">
-                        Your order has been successfully placed. We are preparing it for you. You will receive an email
-                        confirmation shortly.
-                    </p>
-
-                    <button type="button" class="btn btn-primary btn-lg rounded-pill px-5" data-bs-dismiss="modal"
-                        style="font-weight:500; font-size:1rem;">
+                    <a href="{{ route('home') }}" class="btn btn-primary btn-lg rounded-pill px-5">
                         Continue Shopping
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Tick Animation Styles -->
     <style>
         .tick-path {
             stroke-dasharray: 48;
@@ -255,27 +268,21 @@
         }
 
         @keyframes drawTick {
-            to {
-                stroke-dashoffset: 0;
-            }
+            to { stroke-dashoffset: 0; }
         }
 
         @keyframes scaleTick {
-            0% {
-                transform: scale(0);
-            }
-
-            60% {
-                transform: scale(1.2);
-            }
-
-            100% {
-                transform: scale(1);
-            }
+            0% { transform: scale(0); }
+            60% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .nav-tabs .nav-link.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
     </style>
 
-    <!-- Confetti + Livewire event wiring -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script>
         window.addEventListener('show-thankyou', () => {
@@ -285,20 +292,9 @@
                 confetti({
                     particleCount: 80,
                     spread: 70,
-                    origin: {
-                        y: 0.6
-                    }
+                    origin: { y: 0.6 }
                 });
-            }, {
-                once: true
-            });
-        });
-
-        // small helper for notify events (optional)
-        window.addEventListener('notify', (e) => {
-            // you can wire this to your toast library; for now we'll use alert
-            if (e.detail && e.detail.message) {
-                alert(e.detail.message);
-            }
+            }, { once: true });
         });
     </script>
+</div>

@@ -1,8 +1,203 @@
 <div>
+    <style>
+        /* Offer Styles */
+        .offer-label {
+            display: inline-block;
+            background: #ff6b6b;
+            color: #fff;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            animation: pulse 2s infinite;
+        }
 
+        @keyframes pulse {
 
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        .old-price {
+            color: #999;
+            text-decoration: line-through;
+            margin-left: 10px;
+            font-size: 16px;
+        }
+
+        .discount-badge {
+            background: #28a745;
+            color: #fff;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .offer-details-box {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: #fff8e1;
+            border: 1px solid #ffd54f;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 10px 0;
+        }
+
+        .offer-details-box .offer-icon {
+            font-size: 24px;
+        }
+
+        .offer-details-box .offer-content {
+            flex: 1;
+        }
+
+        .offer-details-box .offer-title {
+            font-weight: 600;
+            color: #e65100;
+        }
+
+        .offer-details-box .offer-desc {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .offer-details-box .offer-expiry {
+            color: #999;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .offer-details-box .offer-expiry i {
+            margin-right: 4px;
+        }
+
+        /* Option Item */
+        .option-item {
+            cursor: pointer;
+            padding: 4px 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            margin: 3px;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .option-item:hover {
+            border-color: #000;
+            transform: translateY(-2px);
+        }
+
+        .option-item.active {
+            border-color: #000;
+            background: #000;
+            color: #fff;
+        }
+
+        .color-swatch {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 1px solid #ddd;
+        }
+
+        .option-item.active .color-swatch {
+            border-color: #fff;
+        }
+
+        /* Tabs Enhancement */
+        .nav-tabs .nav-link {
+            color: #666;
+            border: none;
+            padding: 10px 20px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-tabs .nav-link:hover {
+            color: #000;
+            background: #f8f9fa;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: #000;
+            border-bottom: 2px solid #000;
+            background: transparent;
+        }
+
+        .nav-tabs .nav-link .badge {
+            background: #000;
+            color: #fff;
+            border-radius: 50%;
+            padding: 2px 8px;
+            font-size: 11px;
+            margin-left: 5px;
+        }
+
+        /* Stock Badge */
+        .stock-badge {
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .stock-badge.in-stock {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .stock-badge.out-stock {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* More Info List */
+        .ec-single-pro-tab-moreinfo ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .ec-single-pro-tab-moreinfo ul li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+        }
+
+        .ec-single-pro-tab-moreinfo ul li:last-child {
+            border-bottom: none;
+        }
+
+        .ec-single-pro-tab-moreinfo ul li span {
+            font-weight: 600;
+            min-width: 150px;
+            color: #333;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: #fff;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            color: #fff;
+        }
+    </style>
     <!-- Ec breadcrumb start -->
-    <div class="sticky-header-next-sec  ec-breadcrumb section-space-mb">
+    <div class="sticky-header-next-sec ec-breadcrumb section-space-mb">
         <div class="container">
             <div class="row">
                 <div class="col-12">
@@ -11,12 +206,10 @@
                             <h2 class="ec-breadcrumb-title">{{ $product->name }}</h2>
                         </div>
                         <div class="col-md-6 col-sm-12">
-                            <!-- ec-breadcrumb-list start -->
                             <ul class="ec-breadcrumb-list">
                                 <li class="ec-breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
                                 <li class="ec-breadcrumb-item active">Products</li>
                             </ul>
-                            <!-- ec-breadcrumb-list end -->
                         </div>
                     </div>
                 </div>
@@ -35,6 +228,7 @@
                     <div class="single-pro-block">
                         <div class="single-pro-inner">
                             <div class="row">
+                                <!-- IMAGE SECTION - UNCHANGED -->
                                 <div class="single-pro-img single-pro-img-no-sidebar" wire:ignore>
                                     <div class="single-product-scroll">
                                         {{-- 360 View --}}
@@ -80,79 +274,71 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- PRODUCT INFO -->
                                 <div class="single-pro-desc single-pro-desc-no-sidebar">
                                     <div class="single-pro-content">
                                         <h5 class="ec-single-title">{{ $product->name }}</h5>
                                         <div class="ec-single-rating-wrap">
                                             <div class="ec-single-rating">
-                                                <i class="ecicon eci-star fill"></i>
-                                                <i class="ecicon eci-star fill"></i>
-                                                <i class="ecicon eci-star fill"></i>
-                                                <i class="ecicon eci-star fill"></i>
-                                                <i class="ecicon eci-star-o"></i>
+                                                @for ($i = 1; $i <= 5; $i++)
+                                                    @if ($i <= floor($avgRating))
+                                                        <i class="ecicon eci-star fill"></i>
+                                                    @elseif($i - $avgRating < 1)
+                                                        <i class="ecicon eci-star-half-o"></i>
+                                                    @else
+                                                        <i class="ecicon eci-star-o"></i>
+                                                    @endif
+                                                @endfor
                                             </div>
-                                            <span class="ec-read-review"><a href="#ec-spt-nav-review">Be the first to
-                                                    review this product</a></span>
+                                            <span class="ec-read-review">
+                                                <a href="#" wire:click.prevent="setActiveTab('reviews')">
+                                                    {{ $reviewCount }} Reviews
+                                                </a>
+                                            </span>
                                         </div>
-                                        <div class="ec-single-desc">{!! $product->description !!} Lorem ipsum dolor, sit amet
-                                            consectetur adipisicing elit. Cupiditate quae ipsum illum, maxime, commodi
-                                            veniam dolore nobis explicabo minima aut aliquid fuga ad dignissimos
-                                            reprehenderit corrupti voluptatem, blanditiis nesciunt molestiae.</div>
+                                        <div class="ec-single-desc">{!! Str::limit($product->description, 150) !!}</div>
 
-                                        {{-- <div class="ec-single-sales">
-                                            <div class="ec-single-sales-inner">
-                                                <div class="ec-single-sales-title">sales accelerators</div>
-                                                <div class="ec-single-sales-visitor">real time <span>24</span> visitor
-                                                    right now!</div>
-                                                <div class="ec-single-sales-progress">
-                                                    <span class="ec-single-progress-desc">Hurry up!left 29 in
-                                                        stock</span>
-                                                    <span class="ec-single-progressbar"></span>
-                                                </div>
-                                                <div class="ec-single-sales-countdown">
-                                                    <div class="ec-single-countdown"><span
-                                                            id="ec-single-countdown"></span></div>
-                                                    <div class="ec-single-count-desc">Time is Running Out!</div>
-                                                </div>
-                                            </div>
-                                        </div> --}}
-                                        {{-- <div> --}}
-                                        {{-- PRICE + STOCK --}}
+                                        <!-- PRICE + STOCK WITH OFFER -->
                                         <div class="ec-single-price-stoke">
                                             {{-- Price Section --}}
                                             <div class="ec-single-price">
-                                                <span class="ec-single-ps-title">As low as
-                                                    <b>
-                                                        @if ($product->prices)
-                                                            @if ($product->prices->discount_type === 'percent')
-                                                                {{ $product->prices->discount_value }}% OFF
-                                                            @elseif($product->prices->discount_type === 'fixed')
-                                                                {{ $product->prices->discount_value }} Rs OFF
-                                                            @endif
-                                                        @else
-                                                            N/A
-                                                        @endif
-                                                    </b>
-                                                </span>
+                                                @if ($hasOffer)
+                                                    <span class="offer-label">
+                                                        <i class="ecicon eci-fire"></i>
+                                                        {{ $offerDetails->title ?? 'Offer' }}
+                                                    </span>
+                                                @endif
+
+                                                <span class="ec-single-ps-title">Price</span>
 
                                                 <span id="product-price" class="new-price">
-                                                    @if ($activeVariant)
-                                                        Rs.{{ number_format($activeVariant->price, 2) }}
-                                                    @elseif ($product->variants->count() > 0)
-                                                        Rs.{{ number_format($product->variants->min('price'), 2) }}
-                                                    @else
-                                                        Rs.{{ $product->prices->final_price ?? '0.00' }}
-                                                    @endif
+                                                    Rs.{{ number_format($productPrice, 0) }}
                                                 </span>
+
+                                                @if ($originalPrice > $productPrice)
+                                                    <span class="old-price">
+                                                        Rs.{{ number_format($originalPrice, 0) }}
+                                                    </span>
+                                                    <span class="discount-badge">
+                                                        Save {{ $discountPercentage }}%
+                                                    </span>
+                                                @endif
                                             </div>
 
                                             {{-- Stock + SKU --}}
                                             <div class="ec-single-stoke">
                                                 <span class="ec-single-ps-title">
                                                     @if ($activeVariant)
-                                                        {{ $activeVariant->stock > 0 ? 'IN STOCK' : 'OUT OF STOCK' }}
+                                                        {{ $activeVariant->stock > 0 ? '✅ IN STOCK' : '❌ OUT OF STOCK' }}
+                                                        @if ($activeVariant->stock > 0 && $activeVariant->stock <= 10)
+                                                            <small>(Only {{ $activeVariant->stock }} left)</small>
+                                                        @endif
                                                     @elseif ($product->track)
-                                                        {{ $product->stock > 0 ? 'IN STOCK' : 'OUT OF STOCK' }}
+                                                        {{ $product->stock > 0 ? '✅ IN STOCK' : '❌ OUT OF STOCK' }}
+                                                        @if ($product->stock > 0 && $product->stock <= 10)
+                                                            <small>(Only {{ $product->stock }} left)</small>
+                                                        @endif
                                                     @endif
                                                 </span>
 
@@ -162,6 +348,24 @@
                                             </div>
                                         </div>
 
+                                        {{-- OFFER DETAILS --}}
+                                        @if ($hasOffer && $offerDetails)
+                                            <div class="offer-details-box">
+                                                <div class="offer-icon">🎁</div>
+                                                <div class="offer-content">
+                                                    <div class="offer-title">{{ $offerDetails->title }}</div>
+                                                    <div class="offer-desc">
+                                                        {{ $offerDetails->description ?? 'Limited time offer!' }}</div>
+                                                    @if ($offerDetails->end_date)
+                                                        <div class="offer-expiry">
+                                                            <i class="ecicon eci-clock"></i>
+                                                            Expires: {{ $offerDetails->end_date->format('M d, Y') }}
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        @endif
+
                                         {{-- OPTIONS --}}
                                         <div class="ec-pro-variation">
                                             @foreach ($options as $optionName => $values)
@@ -169,22 +373,16 @@
                                                     class="ec-pro-variation-inner ec-pro-variation-{{ strtolower($optionName) }}">
                                                     <span>{{ strtoupper($optionName) }}</span>
                                                     <div class="ec-pro-variation-content">
-                                                        <ul>
+                                                        <ul class="option-list">
                                                             @foreach ($values->unique('value') as $value)
                                                                 <li wire:click="selectOption('{{ $optionName }}', {{ $value->id }})"
-                                                                    style="
-                                    cursor:pointer; 
-                                    width: fit-content; 
-                                    border:2px solid {{ isset($selectedOptions[$optionName]) && $selectedOptions[$optionName] == $value->id ? '#000' : '#ddd' }};
-                                    padding:4px; 
-                                    border-radius:5px;
-                                    margin:3px;
-                                    ">
+                                                                    class="option-item {{ isset($selectedOptions[$optionName]) && $selectedOptions[$optionName] == $value->id ? 'active' : '' }}">
                                                                     @if ($value->color_code)
-                                                                        <span
-                                                                            style="width: 20px !important;height:20px; padding: 0;border-radius:50%;background-color:{{ $value->color_code }};"></span>
+                                                                        <span class="color-swatch"
+                                                                            style="background-color:{{ $value->color_code }};"></span>
                                                                     @else
-                                                                        <span>{{ $value->value }}</span>
+                                                                        <span
+                                                                            class="option-pill">{{ $value->value }}</span>
                                                                     @endif
                                                                 </li>
                                                             @endforeach
@@ -193,29 +391,96 @@
                                                 </div>
                                             @endforeach
                                         </div>
+                                        <style>
+                                            .option-list {
+                                                display: flex;
+                                                flex-wrap: wrap;
+                                                gap: 0.5rem;
+                                                list-style: none;
+                                                padding: 0;
+                                                margin: 0;
+                                                min-width: 300px;
+                                            }
 
+                                            .option-item {
+                                                display: inline-flex;
+                                                cursor: pointer;
+                                                /* no fixed width/height here — let content decide */
+                                            }
+
+                                            .option-pill {
+                                                display: inline-flex;
+                                                align-items: center;
+                                                justify-content: center;
+                                                padding: 0.5rem 1rem;
+                                                white-space: nowrap;
+                                                /* stops the clipping */
+                                                border: 1px solid #d1d5db;
+                                                border-radius: 0.5rem;
+                                                font-size: 0.875rem;
+                                                font-weight: 500;
+                                                color: #374151;
+                                                background: #fff;
+                                                transition: border-color 0.15s, color 0.15s;
+                                            }
+
+                                            .option-item:hover .option-pill {
+                                                border-color: #111827;
+                                                color: #111827;
+                                            }
+
+                                            .option-item.active .option-pill {
+                                                border-color: #111827;
+                                                background: #111827;
+                                                color: #fff;
+                                            }
+
+                                            .color-swatch {
+                                                display: inline-block;
+                                                width: 2rem;
+                                                height: 2rem;
+                                                border-radius: 9999px;
+                                                border: 2px solid #d1d5db;
+                                                transition: border-color 0.15s;
+                                            }
+
+                                            .option-item.active .color-swatch {
+                                                border-color: #6d28d9;
+                                                /* matches the purple ring in your screenshot */
+                                                box-shadow: 0 0 0 2px #fff, 0 0 0 4px #6d28d9;
+                                            }
+                                        </style>
                                         {{-- Quantity + Buttons --}}
                                         <div class="ec-single-qty">
                                             <div class="qty-plus-minus">
                                                 <div class="dec ec_qtybtn" wire:click="decrement">-</div>
-                                                <input class="qty-input" wire:model="qty" type="text" />
+                                                {{ $qty }}
+                                                {{-- <input class="qty-input" wire:model="qty" type="text" /> --}}
                                                 <div class="inc ec_qtybtn" wire:click="increment">+</div>
                                             </div>
 
                                             {{-- Add to Cart --}}
                                             <div class="ec-single-cart">
                                                 <button class="btn btn-primary"
-                                                    wire:click="addCart({{ $product->id }})">
-                                                    Add To Cart
+                                                    wire:click="addCart({{ $product->id }})"
+                                                    wire:loading.attr="disabled">
+                                                    <span wire:loading.remove><i class="ecicon eci-shopping-bag"></i>
+                                                        Add To Cart</span>
+                                                    <span wire:loading>Adding...</span>
                                                 </button>
                                             </div>
+
                                             {{-- Buy Now --}}
                                             <div class="ec-single-cart">
-                                                <button class="btn btn-primary"
-                                                    wire:click="buyNow({{ $product->id }})">
-                                                    Buy Now
+                                                <button class="btn btn-secondary"
+                                                    wire:click="buyNow({{ $product->id }})"
+                                                    wire:loading.attr="disabled">
+                                                    <span wire:loading.remove><i class="ecicon eci-bolt"></i> Buy
+                                                        Now</span>
+                                                    <span wire:loading>Processing...</span>
                                                 </button>
                                             </div>
+
                                             {{-- Wishlist --}}
                                             <div class="ec-single-wishlist active">
                                                 @livewire('web.components.wish.button', ['id' => $product->id])
@@ -255,55 +520,94 @@
                         </div>
                     </div>
                     <!--Single product content End -->
-                    <!-- Single product tab start -->
+
+                    <!-- Single product tab start - ENHANCED -->
                     <div class="ec-single-pro-tab">
                         <div class="ec-single-pro-tab-wrapper">
                             <div class="ec-single-pro-tab-nav">
                                 <ul class="nav nav-tabs" role="tablist">
                                     <li class="nav-item">
-                                        <a class="nav-link active" data-bs-toggle="tab"
-                                            data-bs-target="#ec-spt-nav-details" role="tab"
-                                            aria-controls="ec-spt-nav-details" aria-selected="true">Detail</a>
+                                        <a class="nav-link {{ $activeTab == 'details' ? 'active' : '' }}"
+                                            wire:click="setActiveTab('details')" data-bs-toggle="tab" role="tab">
+                                            <i class="ecicon eci-info-circle"></i> Details
+                                        </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" data-bs-toggle="tab" data-bs-target="#ec-spt-nav-info"
-                                            role="tab" aria-controls="ec-spt-nav-info" aria-selected="false">More
-                                            Information</a>
+                                        <a class="nav-link {{ $activeTab == 'info' ? 'active' : '' }}"
+                                            wire:click="setActiveTab('info')" data-bs-toggle="tab" role="tab">
+                                            <i class="ecicon eci-list-ul"></i> More Information
+                                        </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" data-bs-toggle="tab" data-bs-target="#ec-spt-nav-review"
-                                            role="tab" aria-controls="ec-spt-nav-review"
-                                            aria-selected="false">Reviews</a>
+                                        <a class="nav-link {{ $activeTab == 'reviews' ? 'active' : '' }}"
+                                            wire:click="setActiveTab('reviews')" data-bs-toggle="tab" role="tab">
+                                            <i class="ecicon eci-star"></i> Reviews
+                                            @if ($reviewCount > 0)
+                                                <span class="badge">{{ $reviewCount }}</span>
+                                            @endif
+                                        </a>
                                     </li>
                                 </ul>
                             </div>
-                            <div class="tab-content  ec-single-pro-tab-content">
-                                <div id="ec-spt-nav-details" class="tab-pane fade show active">
+
+                            <div class="tab-content ec-single-pro-tab-content">
+                                <!-- Details Tab -->
+                                <div class="tab-pane fade {{ $activeTab == 'details' ? 'show active' : '' }}"
+                                    id="ec-spt-nav-details">
                                     <div class="ec-single-pro-tab-desc">
-                                        {!! $product->instructions->content !!}
+                                        {!! $product->instructions->content ?? $product->description !!}
                                     </div>
                                 </div>
-                                <div id="ec-spt-nav-info" class="tab-pane fade">
+
+                                <!-- More Information Tab -->
+                                <div class="tab-pane fade {{ $activeTab == 'info' ? 'show active' : '' }}"
+                                    id="ec-spt-nav-info">
                                     <div class="ec-single-pro-tab-moreinfo">
                                         <ul>
-                                            @foreach ($product->ingredients as $ing)
-                                                <li><span>{{ $ing->name }}</span> {{ $ing->percentage . '%' }}
-                                                    ({{ $ing->benefit }})</li>
-                                            @endforeach
-                                            {{-- <li><span>Weight</span> 1000 g</li>
-                                            <li><span>Dimensions</span> 35 × 30 × 7 cm</li>
-                                            <li><span>Color</span> Black, Pink, Red, White</li> --}}
+                                            @if ($product->brand)
+                                                <li><span>Brand</span> {{ $product->brand->name }}</li>
+                                            @endif
+                                            <li><span>SKU</span> {{ $product->sku }}</li>
+                                            @if ($product->ingredients->count() > 0)
+                                                @foreach ($product->ingredients as $ing)
+                                                    <li><span>{{ $ing->name }}</span> {{ $ing->percentage . '%' }}
+                                                        ({{ $ing->benefit }})
+                                                    </li>
+                                                @endforeach
+                                            @endif
+                                            @if ($hasOffer && $offerDetails)
+                                                <li><span>Offer</span> {{ $offerDetails->title }}
+                                                    @if ($offerDetails->discount_type === 'percentage')
+                                                        ({{ $offerDetails->discount_value }}% OFF)
+                                                    @elseif($offerDetails->discount_type === 'fixed')
+                                                        (Rs. {{ $offerDetails->discount_value }} OFF)
+                                                    @endif
+                                                </li>
+                                                @if ($offerDetails->end_date)
+                                                    <li><span>Offer Expires</span>
+                                                        {{ $offerDetails->end_date->format('M d, Y') }}</li>
+                                                @endif
+                                            @endif
+                                            <li><span>Stock</span>
+                                                <span
+                                                    class="stock-badge {{ ($activeVariant ? $activeVariant->stock : $product->stock) > 0 ? 'in-stock' : 'out-stock' }}">
+                                                    {{ ($activeVariant ? $activeVariant->stock : $product->stock) > 0 ? 'In Stock' : 'Out of Stock' }}
+                                                </span>
+                                            </li>
                                         </ul>
                                     </div>
                                 </div>
 
-                                @livewire('web.components.single.rating-component', ['id' => $product->id])
+                                <!-- Reviews Tab -->
+                                <div class="tab-pane fade {{ $activeTab == 'reviews' ? 'show active' : '' }}"
+                                    id="ec-spt-nav-review">
+                                    @livewire('web.components.single.rating-component', ['id' => $product->id])
+                                </div>
                             </div>
                         </div>
                     </div>
                     <!-- product details description area end -->
                 </div>
-
             </div>
         </div>
     </section>
@@ -330,25 +634,22 @@
     <!-- Related Product end -->
 
 </div>
+
+
+
 <script>
     window.addEventListener('variant-selected', event => {
-        // Access the data using event.detail
-        console.log(event.detail.image);
         const image = event.detail.image;
         if (!image) return;
 
-        // Replace cover + thumb
         document.getElementById('cover-main').src = image;
         document.getElementById('thumb-main').src = image;
 
-        // Reset to first slide
         $('#product-cover').slick('slickGoTo', 0);
         $('#product-thumbs').slick('slickGoTo', 0);
     });
-</script>
-<script>
+
     document.addEventListener("DOMContentLoaded", function() {
-        // Init Slick once
         $('#product-cover').slick({
             slidesToShow: 1,
             slidesToScroll: 1,
@@ -363,31 +664,5 @@
             asNavFor: '#product-cover',
             focusOnSelect: true
         });
-
-        // Listen for variant change events
-        window.addEventListener('variant-selected', function(e) {
-            console.log(e.detail.image);
-
-            const image = e.detail.image;
-            if (!image) return;
-
-            // Replace cover + thumb
-            document.getElementById('cover-main').src = image;
-            document.getElementById('thumb-main').src = image;
-
-            // Reset to first slide
-            $('#product-cover').slick('slickGoTo', 0);
-            $('#product-thumbs').slick('slickGoTo', 0);
-        });
     });
-    let toast = document.getElementById('toast');
-    toast.addEventListener("click", function() {
-        Toastify({
-            text: "This is a toast",
-            className: "info",
-            style: {
-                background: "linear-gradient(to right, #00b09b, #96c93d)",
-            }
-        }).showToast();
-    })
 </script>

@@ -12,7 +12,10 @@
     </div>
 
     @if (session()->has('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+        <div class="alert alert-success d-flex align-items-center justify-content-between">
+            <span>{{ session('success') }}</span>
+            <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+        </div>
     @endif
 
     <div class="card mb-4">
@@ -39,40 +42,50 @@
                                         <div><small class="text-muted">{{ \Str::limit($offer->description, 90) }}</small></div>
                                     @endif
                                 </td>
-                                <td>{{ ucfirst($offer->type) }}</td>
+                                <td>
+                                    <span class="badge bg-light text-dark text-capitalize">{{ str_replace('_', ' ', $offer->type) }}</span>
+                                </td>
                                 <td>
                                     @if($offer->discount_type === 'percentage')
-                                        {{ (float) rtrim(rtrim($offer->discount_value + 0, '0'), '.') }}%
+                                        <span class="fw-semibold">{{ (float) rtrim(rtrim($offer->discount_value + 0, '0'), '.') }}%</span>
                                     @elseif($offer->discount_type === 'free_shipping')
-                                        Free shipping
+                                        <span class="text-success fw-semibold">Free shipping</span>
                                     @else
-                                        {{ number_format($offer->discount_value, 2) }}
+                                        <span class="fw-semibold">{{ number_format($offer->discount_value, 2) }}</span>
                                     @endif
                                 </td>
                                 <td>
-                                    @if($offer->start_date) {{ $offer->start_date->format('d M, Y') }} @else — @endif
-                                     -
-                                    @if($offer->end_date) {{ $offer->end_date->format('d M, Y') }} @else — @endif
+                                    <div class="small">
+                                        <div><span class="text-muted">Start:</span> {{ $offer->start_date ? $offer->start_date->format('d M, Y') : '—' }}</div>
+                                        <div><span class="text-muted">End:</span> {{ $offer->end_date ? $offer->end_date->format('d M, Y') : '—' }}</div>
+                                    </div>
                                 </td>
                                 <td>
                                     <span class="fw-semibold">{{ $offer->coupons_count }}</span>
-                                    <a href="" class="btn btn-sm btn-outline-secondary ms-2">Manage</a>
+                                    <a href="{{ route('dev-coupons') }}" class="btn btn-sm btn-outline-secondary ms-2">Manage</a>
                                 </td>
                                 <td>
-                                    <span wire:click="toggle({{ $offer->id }})" style="cursor:pointer"
-                                          class="badge {{ $offer->status ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }}">
+                                    <button type="button" wire:click="toggle({{ $offer->id }})"
+                                            class="badge border-0 {{ $offer->status ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' }}">
                                         {{ $offer->status ? 'Active' : 'Inactive' }}
-                                    </span>
+                                    </button>
                                 </td>
                                 <td>
                                     <div class="d-flex gap-1">
-                                        <button wire:click="edit({{ $offer->id }})" class="btn btn-sm btn-outline-primary">Edit</button>
-                                        <button wire:click="delete({{ $offer->id }})" class="btn btn-sm btn-outline-danger">Delete</button>
+                                        <button type="button" wire:click="edit({{ $offer->id }})" class="btn btn-sm btn-outline-primary">Edit</button>
+                                        <button type="button" wire:click="delete({{ $offer->id }})" class="btn btn-sm btn-outline-danger">Delete</button>
                                     </div>
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="7" class="text-center">No offers found</td></tr>
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <div class="fw-semibold mb-2">No offers created yet</div>
+                                        <div>Create your first promotional offer to drive sales.</div>
+                                    </div>
+                                </td>
+                            </tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -107,7 +120,7 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Type</label>
-                            <select class="form-select" wire:model="type">
+                            <select class="form-select" wire:model.live="type">
                                 <option value="product">Product</option>
                                 <option value="category">Category</option>
                                 <option value="cart">Cart</option>
@@ -135,56 +148,51 @@
                             <label class="form-label">Select {{ ucfirst($type) }}</label>
 
                             <div x-data="{
-                                open: false,
                                 search: '',
                                 selected: @entangle('applies_to').defer,
                                 options: @js($options),
-
                                 get filtered() {
-                                    if (!this.search) return this.options;
-                                    return this.options.filter(o => o.label.toLowerCase().includes(this.search.toLowerCase()));
+                                    const term = (this.search || '').toLowerCase();
+                                    if (!term) return this.options;
+                                    return this.options.filter(option => option.label.toLowerCase().includes(term));
                                 },
-
-                                toggle(v) {
-                                    if(this.selected.includes(v)) {
-                                        this.selected = this.selected.filter(x => x !== v);
+                                toggle(optionValue) {
+                                    const value = Number(optionValue);
+                                    if (!Array.isArray(this.selected)) {
+                                        this.selected = [];
+                                    }
+                                    if (this.selected.includes(value)) {
+                                        this.selected = this.selected.filter(item => item !== value);
                                     } else {
-                                        this.selected.push(v);
+                                        this.selected = [...this.selected, value];
                                     }
                                 }
-                            }" class="position-relative">
-                                <div class="form-control d-flex justify-content-between" 
-                                     @click="open = !open" style="cursor:pointer">
-                                    <div>
-                                        <template x-if="selected.length">
-                                            <span x-text="options.filter(o => selected.includes(o.value)).map(o => o.label).join(', ')"></span>
-                                        </template>
-                                        <template x-if="!selected.length">
-                                            <span class="text-muted">Click to select...</span>
-                                        </template>
-                                    </div>
-                                    <i class="bi bi-chevron-down"></i>
+                            }" class="border rounded p-3 bg-light">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div class="small text-muted">Choose one or more {{ strtolower($type) }}s</div>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" @click="selected = []; search = ''">Clear</button>
                                 </div>
 
-                                <div x-show="open" x-transition 
-                                     @click.outside="open = false" 
-                                     class="border bg-white position-absolute w-100 p-2"
-                                     style="z-index:1000; max-height:280px; overflow:auto;">
-                                    <div class="d-flex mb-2">
-                                        <input x-model="search" class="form-control form-control-sm me-2" placeholder="Search...">
-                                        <button type="button" class="btn btn-sm btn-outline-secondary" @click="selected = []; search = ''">Clear</button>
-                                    </div>
-                                    <template x-for="opt in filtered" :key="opt.value">
-                                        <div class="form-check p-1" @click="toggle(opt.value)" style="cursor:pointer">
-                                            <input class="form-check-input" type="checkbox" :checked="selected.includes(opt.value)">
-                                            <label class="form-check-label" x-text="opt.label"></label>
-                                        </div>
+                                <input type="text" class="form-control form-control-sm mb-2" x-model="search" placeholder="Search {{ strtolower($type) }}s...">
+
+                                <div class="border rounded bg-white" style="max-height: 220px; overflow: auto;">
+                                    <template x-for="option in filtered" :key="option.value">
+                                        <label class="d-flex align-items-center gap-2 px-3 py-2 border-bottom" style="cursor:pointer;">
+                                            <input type="checkbox" class="form-check-input" :checked="selected.includes(Number(option.value))" @change="toggle(option.value)">
+                                            <span x-text="option.label"></span>
+                                        </label>
+                                    </template>
+
+                                    <template x-if="filtered.length === 0">
+                                        <div class="px-3 py-2 text-muted small">No matches found</div>
                                     </template>
                                 </div>
 
+                                <div class="mt-2 small text-muted" x-text="Array.isArray(selected) && selected.length ? `${selected.length} selected` : 'No selection yet'"></div>
+
                                 <div class="mt-2">
-                                    <template x-for="opt in options.filter(o => applies_to.includes(o.value))" :key="opt.value">
-                                        <span class="badge bg-primary me-1" x-text="opt.label"></span>
+                                    <template x-for="option in options.filter(option => Array.isArray(selected) && selected.includes(Number(option.value)))" :key="option.value">
+                                        <span class="badge bg-primary me-1 mb-1" x-text="option.label"></span>
                                     </template>
                                 </div>
                             </div>

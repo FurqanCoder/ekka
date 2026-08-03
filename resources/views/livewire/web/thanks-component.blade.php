@@ -56,11 +56,11 @@
             <!-- Buttons -->
             <div class="flex flex-col sm:flex-row gap-4 justify-center opacity-0" id="buttons">
 
-                <a href="" class="btn-primary px-6 py-3 rounded-full text-center">
+                <a href="{{route('home')}}" class="btn-primary px-6 py-3 rounded-full text-center">
                     Continue Shopping
                 </a>
 
-                <a href="" class="btn-outline px-6 py-3 rounded-full text-center">
+                <a href="{{ route('web-order-details', $order->invoice_no) }}" class="btn-outline px-6 py-3 rounded-full text-center">
                     View Order Details
                 </a>
 

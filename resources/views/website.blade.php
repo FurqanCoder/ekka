@@ -443,7 +443,7 @@
                                             <ul class="sub-menu sub-menu-child">
                                                 <li><a href="404-error-page.html">404 error page</a></li>
                                                 <li><a href="under-maintenance.html">maintanence page</a></li>
-                                                <li><a href="coming-soon.html">Coming soon page</a></li>
+                                                <li><a href="{{ route('coming-soon') }}">Coming soon page</a></li>
                                             </ul>
                                         </li>
                                         <li class="dropdown position-static">
@@ -655,7 +655,7 @@
                                     <ul class="sub-menu">
                                         <li><a href="404-error-page.html">404 Error Page</a></li>
                                         <li><a href="under-maintenance.html">Maintenance Page</a></li>
-                                        <li><a href="coming-soon.html">Comming Soon Page</a></li>
+                                        <li><a href="{{ route('coming-soon') }}">Comming Soon Page</a></li>
                                     </ul>
                                 </li>
                                 <li><a href="javascript:void(0)">Vendor Catalog Pages</a>

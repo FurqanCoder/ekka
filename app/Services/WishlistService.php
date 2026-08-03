@@ -62,4 +62,13 @@ class WishlistService
 
         return $status;
     }
+    public function count()
+    {
+        if (Auth::check()) {
+            return Wishlist::where('user_id', Auth::id())->count();
+        }
+
+        $wishlist = collect(json_decode(Cookie::get($this->cookieName, '[]'), true));
+        return $wishlist->count();
+    }
 }

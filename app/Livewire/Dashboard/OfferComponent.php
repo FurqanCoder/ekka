@@ -40,7 +40,7 @@ class OfferComponent extends Component
 
     protected function rules()
     {
-        return [
+        $rules = [
             'title' => 'required|string|max:255',
             'type' => ['required', Rule::in(['product', 'category', 'cart', 'shipping', 'user', 'order'])],
             'discount_type' => ['required', Rule::in(['percentage', 'fixed', 'bogo', 'free_shipping'])],
@@ -54,11 +54,17 @@ class OfferComponent extends Component
             'first_order_only' => 'boolean',
             'loyalty_points_needed' => 'nullable|integer|min:0',
             'stackable' => 'boolean',
-            'start_date' => 'nullable|date|after_or_equal:now',
-            'end_date'   => 'nullable|date|after_or_equal:start_date|after_or_equal:now',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
             'status' => 'boolean',
             'description' => 'nullable|string|max:2000',
         ];
+
+        if (in_array($this->type, ['product', 'category'], true)) {
+            $rules['applies_to'] = ['required', 'array', 'min:1'];
+        }
+
+        return $rules;
     }
 
     public function mount()
@@ -68,9 +74,14 @@ class OfferComponent extends Component
 
     public function updatedType($value)
     {
-        // reset selection when type changes
         $this->applies_to = [];
+        $this->options = [];
         $this->loadOptions();
+    }
+
+    public function updatedAppliesTo($value)
+    {
+        $this->applies_to = array_values(array_unique(array_filter(array_map('intval', (array) $value))));
     }
 
     protected function loadOptions()
@@ -119,28 +130,29 @@ class OfferComponent extends Component
         $this->validate();
 
         Offer::create([
-            'title' => $this->title,
+            'title' => trim($this->title),
             'type' => $this->type,
             'discount_type' => $this->discount_type,
             'discount_value' => $this->discount_value,
             'min_cart_amount' => $this->min_cart_amount,
             'max_discount' => $this->max_discount,
-            'code' => $this->code,
+            'code' => $this->code ? trim($this->code) : null,
             'usage_limit' => $this->usage_limit,
             'per_user_limit' => $this->per_user_limit,
             'applies_to' => $this->applies_to ?: null,
-            'first_order_only' => (bool)$this->first_order_only,
+            'first_order_only' => (bool) $this->first_order_only,
             'loyalty_points_needed' => $this->loyalty_points_needed,
-            'stackable' => (bool)$this->stackable,
-            'start_date' => $this->start_date ?: null,
-            'end_date' => $this->end_date ?: null,
-            'status' => (bool)$this->status,
-            'description' => $this->description,
+            'stackable' => (bool) $this->stackable,
+            'start_date' => $this->start_date ? $this->normalizeDateTime($this->start_date) : null,
+            'end_date' => $this->end_date ? $this->normalizeDateTime($this->end_date) : null,
+            'status' => (bool) $this->status,
+            'description' => $this->description ? trim($this->description) : null,
         ]);
 
         session()->flash('success', 'Offer created successfully.');
         $this->dispatch('hide-offer-modal');
         $this->resetForm();
+        $this->resetPage();
     }
 
     public function edit($id)
@@ -177,34 +189,36 @@ class OfferComponent extends Component
         $offer = Offer::findOrFail($this->offerId);
 
         $offer->update([
-            'title' => $this->title,
+            'title' => trim($this->title),
             'type' => $this->type,
             'discount_type' => $this->discount_type,
             'discount_value' => $this->discount_value,
             'min_cart_amount' => $this->min_cart_amount,
             'max_discount' => $this->max_discount,
-            'code' => $this->code,
+            'code' => $this->code ? trim($this->code) : null,
             'usage_limit' => $this->usage_limit,
             'per_user_limit' => $this->per_user_limit,
             'applies_to' => $this->applies_to ?: null,
-            'first_order_only' => (bool)$this->first_order_only,
+            'first_order_only' => (bool) $this->first_order_only,
             'loyalty_points_needed' => $this->loyalty_points_needed,
-            'stackable' => (bool)$this->stackable,
-            'start_date' => $this->start_date ?: null,
-            'end_date' => $this->end_date ?: null,
-            'status' => (bool)$this->status,
-            'description' => $this->description,
+            'stackable' => (bool) $this->stackable,
+            'start_date' => $this->start_date ? $this->normalizeDateTime($this->start_date) : null,
+            'end_date' => $this->end_date ? $this->normalizeDateTime($this->end_date) : null,
+            'status' => (bool) $this->status,
+            'description' => $this->description ? trim($this->description) : null,
         ]);
 
         session()->flash('success', 'Offer updated successfully.');
         $this->dispatch('hide-offer-modal');
         $this->resetForm();
+        $this->resetPage();
     }
 
     public function delete($id)
     {
         Offer::findOrFail($id)->delete();
-        session()->flash('success', 'Offer deleted.');
+        session()->flash('success', 'Offer deleted successfully.');
+        $this->resetPage();
     }
 
     public function toggle($id)
@@ -212,6 +226,17 @@ class OfferComponent extends Component
         $offer = Offer::findOrFail($id);
         $offer->status = !$offer->status;
         $offer->save();
+
+        session()->flash('success', $offer->status ? 'Offer activated.' : 'Offer deactivated.');
+    }
+
+    protected function normalizeDateTime($value)
+    {
+        if (empty($value)) {
+            return null;
+        }
+
+        return \Carbon\Carbon::parse($value)->toDateTimeString();
     }
 
     public function render()

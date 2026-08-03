@@ -10,10 +10,12 @@ use Illuminate\Support\Str;
 class Product extends Model
 {
     use HasFactory, SoftDeletes;
+    
     protected $fillable = [
         'name','slug','description','brand_id','status','scheduled_at',
         'sku','stock','track','meta_title','meta_description','meta_keywords'
     ];
+    
     // Automatically set slug if not provided
     protected static function booted()
     {
@@ -23,6 +25,7 @@ class Product extends Model
             }
         });
     }
+    
     public function brand()
     {
         return $this->belongsTo(Brand::class);
@@ -67,6 +70,32 @@ class Product extends Model
     {
         return $this->hasMany(ProductVariant::class)->where('active', true);
     }
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    // Products sold through orders
+    public function orders()
+    {
+        return $this->belongsToMany(Order::class, 'order_items')
+                    ->withPivot('quantity', 'price', 'total')
+                    ->withTimestamps();
+    }
+
+    // Get total quantity sold
+    public function getTotalSoldAttribute()
+    {
+        return $this->orderItems()->sum('quantity');
+    }
+
+    // Get total revenue from this product
+    public function getTotalRevenueAttribute()
+    {
+        return $this->orderItems()->sum('total');
+    }
+
     public function getMetaTitleAttribute($value)
     {
         return $value ?: $this->name;
@@ -76,32 +105,38 @@ class Product extends Model
     {
         return $value ?: $this->description;
     }
-// App\Models\Product.php
-public function optionValuesByName(string $optionName)
-{
-    return $this->variants
-        ->flatMap->optionValues
-        ->filter(fn($v) => $v->option && strtolower($v->option->name) === strtolower($optionName))
-        ->unique('value');
-}
-public function reviews()
-{
-    return $this->hasMany(ProductReview::class);
-}
 
-public function avgRating()
-{
-    return $this->reviews()->avg('rating');
-}
+    // App\Models\Product.php
+    public function optionValuesByName(string $optionName)
+    {
+        return $this->variants
+            ->flatMap->optionValues
+            ->filter(fn($v) => $v->option && strtolower($v->option->name) === strtolower($optionName))
+            ->unique('value');
+    }
 
-public function reviewCount()
-{
-    return $this->reviews()->count();
-}
+    public function reviews()
+    {
+        return $this->hasMany(ProductReview::class);
+    }
 
-public function getRouteKeyName()
-{
-    return 'slug';
-}
+    public function approvedReviews()
+    {
+        return $this->hasMany(ProductReview::class)->where('approved', true);
+    }
 
+    public function avgRating()
+    {
+        return $this->approvedReviews()->avg('rating');
+    }
+
+    public function reviewCount()
+    {
+        return $this->approvedReviews()->count();
+    }
+
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
 }

@@ -14,7 +14,15 @@ class CustomerRegisterComponent extends Component
 {
     public $name;
     public $email;
-    public $password; // ✅ fixed typo (was passwword)
+    public $password;
+    public $isCheckout = false; // Flag for checkout forced login
+    public $returnUrl = null;
+
+    protected $listeners = [
+        'showSignup' => 'showSignup',
+        'showLogin'  => 'showLogin',
+        'forceLogin' => 'forceLogin',
+    ];
 
     protected $rules = [
         'name'     => 'required|string|min:3|max:255',
@@ -22,25 +30,25 @@ class CustomerRegisterComponent extends Component
         'password' => 'required|min:6',
     ];
 
-    /**
-     * Show Signup Modal
-     */
     public function showSignup()
     {
+        $this->resetErrorBag();
         $this->dispatch('switch-to-signup');
     }
 
-    /**
-     * Show Login Modal
-     */
     public function showLogin()
     {
+        $this->resetErrorBag();
         $this->dispatch('switch-to-login');
     }
 
-    /**
-     * Handle User Registration
-     */
+    public function forceLogin($returnUrl = null)
+    {
+        $this->isCheckout = true;
+        $this->returnUrl = $returnUrl;
+        $this->dispatch('switch-to-login');
+    }
+
     public function register()
     {
         $this->validate();
@@ -53,66 +61,59 @@ class CustomerRegisterComponent extends Component
 
         $user->assignRole('customer');
         session()->regenerate();
-        // Auto-login the new user
         Auth::login($user);
-        app(\App\Services\CartService::class)->mergeGuestCartWithUserCart($user->id);
+        app(CartService::class)->mergeGuestCartWithUserCart($user->id);
 
-
-        // 🔥 Merge guest cart to DB after login
-        // app(CartService::class)->mergeSessionToDatabase();
-
-        // Close signup modal and refresh page/cart
-        $this->dispatch('close-login'); // if you use same modal for both login/signup
+        // Close modal
+        $this->dispatch('close-login');
         $this->dispatch('userLoggedIn');
-        $this->dispatch('$refresh');
+
+        // For checkout, redirect back
+        if ($this->isCheckout) {
+            return redirect()->route('web-check-out');
+        }
 
         session()->flash('success', 'Account created and logged in successfully!');
     }
 
-    /**
-     * Handle User Login
-     */
-   public function login()
-{
-    $this->validate([
-        'email'    => 'required|email',
-        'password' => 'required',
-    ]);
+    public function login()
+    {
+        $this->validate([
+            'email'    => 'required|email',
+            'password' => 'required',
+        ]);
 
-    if (Auth::attempt(['email' => $this->email, 'password' => $this->password])) {
-        // Regenerate session to prevent fixation
-        session()->regenerate();
+        if (Auth::attempt(['email' => $this->email, 'password' => $this->password])) {
+            session()->regenerate();
+            $user = Auth::user();
 
-        // ✅ Get logged-in user
-        $user = Auth::user();
+            // Merge guest cart
+            app(CartService::class)->mergeGuestCartWithUserCart($user->id);
 
-        // ✅ Transfer guest cart (cookie) into database
-        app(\App\Services\CartService::class)->mergeGuestCartWithUserCart($user->id);
-        $guestItems = json_decode(Cookie::get('wishlist_items', '[]'), true);
+            // Merge guest wishlist
+            $guestItems = json_decode(Cookie::get('wishlist_items', '[]'), true);
+            foreach ($guestItems as $productId) {
+                Wishlist::firstOrCreate([
+                    'user_id' => auth()->id(),
+                    'product_id' => $productId,
+                ]);
+            }
+            Cookie::queue(Cookie::forget('wishlist_items'));
 
-foreach ($guestItems as $productId) {
-    Wishlist::firstOrCreate([
-        'user_id' => auth()->id(),
-        'product_id' => $productId,
-    ]);
-}
+            $this->dispatch('close-login');
+            $this->dispatch('userLoggedIn');
 
-Cookie::queue(Cookie::forget('wishlist_items'));
+            // For checkout, redirect back
+            if ($this->isCheckout) {
+                return redirect()->route('web-check-out');
+            }
 
+            session()->flash('success', 'Login successful!');
+            return;
+        }
 
-        // ✅ Fire Livewire browser events
-        $this->dispatch('close-login');
-        $this->dispatch('userLoggedIn');
-        $this->dispatch('$refresh');
-
-        session()->flash('success', 'Login successful!');
-        return;
+        $this->addError('email', 'These credentials do not match our records.');
     }
-
-    // ❌ Wrong credentials
-    $this->addError('email', 'These credentials do not match our records.');
-}
-
 
     public function render()
     {

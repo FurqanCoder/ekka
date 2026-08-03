@@ -16,7 +16,6 @@ class QuickViewModal extends Component
 
     public function showModal($product_id)
     {
-        dd($product_id);
         // Always load a single model, never a collection
         $this->product = Product::with([
             'categories',
@@ -118,7 +117,6 @@ class QuickViewModal extends Component
 
     public function render()
     {
-        dd($this->product);
         $options = collect();
 
         if ($this->product && $this->product->variants && $this->product->variants->count() > 0) {

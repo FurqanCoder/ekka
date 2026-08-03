@@ -4,6 +4,7 @@ namespace App\Livewire\Web;
 
 use App\Models\Product;
 use App\Models\Cart;
+use App\Models\Offer;
 use App\Services\CartService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
@@ -13,9 +14,18 @@ use Livewire\Component;
 class WebProductComponent extends Component
 {
     public $product;
-    public $selectedOptions = [];   // optionName => optionValueId
+    public $selectedOptions = [];
     public $activeVariant = null;
     public $qty = 1;
+    public $activeTab = 'details';
+    
+    // Offer properties
+    public $productPrice = 0;
+    public $originalPrice = 0;
+    public $discountPercentage = 0;
+    public $hasOffer = false;
+    public $offerDetails = null;
+    public $offerApplied = false;
 
     public function mount($slug)
     {
@@ -30,7 +40,10 @@ class WebProductComponent extends Component
             'variants.optionValues.option'
         ])->where('slug', $slug)->firstOrFail();
 
-        // ✅ Preselect first available option for each group
+        // Load offers for this product
+        $this->loadProductOffers();
+
+        // Preselect first available option for each group
         $options = $this->product->variants
             ->flatMap->optionValues
             ->groupBy(fn($v) => $v->option->name);
@@ -41,6 +54,57 @@ class WebProductComponent extends Component
 
         // Match default variant on mount
         $this->matchVariant();
+    }
+
+    /**
+     * Load active offers for this product
+     */
+    public function loadProductOffers()
+    {
+        $this->productPrice = $this->product->prices->final_price ?? 0;
+        $this->originalPrice = $this->product->prices->original_price ?? $this->productPrice;
+        $this->discountPercentage = 0;
+        $this->hasOffer = false;
+        $this->offerDetails = null;
+        $this->offerApplied = false;
+
+        // Get product categories IDs
+        $categoryIds = $this->product->categories->pluck('id')->toArray();
+
+        // Check for active offers
+        $offer = Offer::active()
+            ->where(function($query) use ($categoryIds) {
+                $query->where('type', 'global')
+                    ->orWhere(function($q) use ($categoryIds) {
+                        $q->where('type', 'product')
+                            ->whereJsonContains('applies_to', $this->product->id);
+                    })
+                    ->orWhere(function($q) use ($categoryIds) {
+                        $q->where('type', 'category')
+                            ->where(function($sub) use ($categoryIds) {
+                                foreach ($categoryIds as $id) {
+                                    $sub->orWhereJsonContains('applies_to', $id);
+                                }
+                            });
+                    });
+            })
+            ->first();
+
+        if ($offer) {
+            $this->hasOffer = true;
+            $this->offerDetails = $offer;
+            $this->offerApplied = true;
+            
+            // Calculate discount
+            if ($offer->discount_type === 'percentage') {
+                $this->discountPercentage = $offer->discount_value;
+                $discountAmount = ($this->originalPrice * $offer->discount_value) / 100;
+                $this->productPrice = max(0, $this->originalPrice - $discountAmount);
+            } elseif ($offer->discount_type === 'fixed') {
+                $this->productPrice = max(0, $this->originalPrice - $offer->discount_value);
+                $this->discountPercentage = round((($this->originalPrice - $this->productPrice) / $this->originalPrice) * 100);
+            }
+        }
     }
 
     public function selectOption($optionName, $valueId)
@@ -58,8 +122,27 @@ class WebProductComponent extends Component
 
         $this->activeVariant = $variant;
 
+        // Update variant price with offer
+        if ($variant) {
+            $variantPrice = $variant->price;
+            if ($this->hasOffer && $this->offerDetails) {
+                if ($this->offerDetails->discount_type === 'percentage') {
+                    $discountAmount = ($variantPrice * $this->offerDetails->discount_value) / 100;
+                    $variantPrice = max(0, $variantPrice - $discountAmount);
+                } elseif ($this->offerDetails->discount_type === 'fixed') {
+                    $variantPrice = max(0, $variantPrice - $this->offerDetails->discount_value);
+                }
+            }
+            $this->productPrice = $variantPrice;
+        }
+
         // Send updated variant image to JS (gallery swap)
         $this->dispatch('variant-selected', image: $variant->image ?? null);
+    }
+
+    public function setActiveTab($tab)
+    {
+        $this->activeTab = $tab;
     }
 
     public function decrement()
@@ -73,19 +156,17 @@ class WebProductComponent extends Component
     {
         $this->qty++;
     }
+
     public function addCart($productId)
     {
         $cartService = app(\App\Services\CartService::class);
 
-        // Case 1: Product has variants → must select
         if ($this->activeVariant) {
             $result = $cartService->add($productId, $this->activeVariant->id, $this->qty);
         } else {
-            // Case 2: No variants → add directly
             $product = \App\Models\Product::with('variants')->find($productId);
 
             if ($product && $product->variants->count() > 0) {
-                // Product HAS variants but user did not select
                 $this->dispatch('toast', [
                     'message' => 'Please select a variant first!',
                     'type'    => 'error',
@@ -93,7 +174,6 @@ class WebProductComponent extends Component
                 return;
             }
 
-            // Product has NO variants
             $result = $cartService->add($productId, null, $this->qty);
         }
 
@@ -106,6 +186,42 @@ class WebProductComponent extends Component
             $this->dispatch('cart-updated');
         }
     }
+
+    public function buyNow($productId)
+    {
+        $cartService = app(CartService::class);
+
+        if ($this->activeVariant) {
+            $result = $cartService->add($productId, $this->activeVariant->id, $this->qty);
+        } else {
+            $product = Product::with('variants')->find($productId);
+
+            if ($product && $product->variants->count() > 0) {
+                $this->dispatch('toast', [
+                    'message' => 'Please select a variant first!',
+                    'type'    => 'error',
+                ]);
+                return;
+            }
+
+            $result = $cartService->add($productId, null, $this->qty);
+        }
+
+        if ($result['status'] === 'success') {
+            $this->dispatch('cart-updated');
+            $this->dispatch('toast', [
+                'message' => 'Redirecting to checkout...',
+                'type'    => 'success',
+            ]);
+            return redirect()->route('checkout');
+        } else {
+            $this->dispatch('toast', [
+                'message' => $result['message'] ?? 'Failed to process buy now.',
+                'type'    => 'error',
+            ]);
+        }
+    }
+
     public function render()
     {
         // Group options by their name
@@ -113,10 +229,21 @@ class WebProductComponent extends Component
             ->flatMap->optionValues
             ->groupBy(fn($v) => $v->option->name);
 
+        // Calculate average rating
+        $avgRating = $this->product->reviews->avg('rating') ?? 0;
+        $reviewCount = $this->product->reviews->count();
+
         return view('livewire.web.web-product-component', [
             'product' => $this->product,
             'options' => $options,
-            'activeVariant' => $this->activeVariant
+            'activeVariant' => $this->activeVariant,
+            'avgRating' => $avgRating,
+            'reviewCount' => $reviewCount,
+            'productPrice' => $this->productPrice,
+            'originalPrice' => $this->originalPrice,
+            'discountPercentage' => $this->discountPercentage,
+            'hasOffer' => $this->hasOffer,
+            'offerDetails' => $this->offerDetails,
         ])->extends('layouts.web')->section('web-content');
     }
 }

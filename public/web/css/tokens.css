@@ -1,0 +1,233 @@
+/* =================================================================
+   CLOUD SKIN BEAUTY — DESIGN TOKENS
+   Source of truth for all color, type, spacing & radius values.
+   Load this AFTER demo1.css / style.css / responsive.css and
+   BEFORE theme.css.
+   ================================================================= */
+
+:root {
+  /* -----------------------------------------------------------
+     COLOR — BRAND
+     Gold  = primary (foil ring / packaging accents / icon lines)
+     Rose  = secondary (the "Cloud Skin" wordmark, warm CTAs)
+     Ink   = neutral base (packaging black, body text)
+     ----------------------------------------------------------- */
+  --color-primary:            #C9A227; /* champagne gold        */
+  --color-primary-hover:      #B08D1F;
+  --color-primary-active:     #9A7A1A;
+  --color-primary-light:      #F1E6BE; /* tint for chips/badges */
+  --color-primary-contrast:   #1E1A16; /* text ON gold          */
+
+  --color-secondary:          #B76E79; /* dusty rose / mauve    */
+  --color-secondary-hover:    #A15C68;
+  --color-secondary-active:   #8C4C58;
+  --color-secondary-light:    #F3DEE2;
+  --color-secondary-contrast: #FFFFFF;
+
+  --color-accent:              #7C5A3A; /* warm bronze, for rare 3rd-tier accents */
+  --color-accent-hover:        #6A4B2F;
+
+  /* -----------------------------------------------------------
+     COLOR — SURFACES
+     ----------------------------------------------------------- */
+  --color-background:         #FDF8F4; /* warm blush-ivory page bg */
+  --color-surface:             #FFFFFF; /* header/footer/nav strips */
+  --color-card:                #FFFFFF;
+  --color-card-alt:            #FBF3EE; /* subtle alt row / hover bg */
+  --color-border:               #E8DED2;
+  --color-divider:              #EFE7DC;
+  --color-overlay:              rgba(24, 20, 16, 0.6);
+
+  /* -----------------------------------------------------------
+     COLOR — SEMANTIC / STATUS
+     ----------------------------------------------------------- */
+  --color-success:       #4F7A5B;
+  --color-success-light: #E1EDE4;
+  --color-warning:       #C98A2E;
+  --color-warning-light: #F5E6CC;
+  --color-error:         #B3454B;
+  --color-error-light:   #F5DEDF;
+  --color-info:          #6D87A6;
+  --color-info-light:    #E4EAF0;
+
+  /* -----------------------------------------------------------
+     COLOR — TEXT
+     ----------------------------------------------------------- */
+  --color-text-primary:   #241F1B;
+  --color-text-secondary: #5C5248;
+  --color-text-muted:     #8A8074;
+  --color-text-disabled:  #C9C2B8;
+  --color-text-on-dark:   #F5F1EC;
+  --color-text-link:      var(--color-secondary);
+  --color-text-link-hover: var(--color-secondary-hover);
+
+  /* -----------------------------------------------------------
+     COLOR — INTERACTION STATES (generic, layered over any surface)
+     ----------------------------------------------------------- */
+  --state-hover-overlay:   rgba(36, 31, 27, 0.04);
+  --state-active-overlay:  rgba(36, 31, 27, 0.08);
+  --state-selected-bg:     var(--color-primary-light);
+  --state-disabled-bg:     #F1ECE4;
+  --state-disabled-fg:     var(--color-text-disabled);
+  --state-focus-ring:      rgba(201, 162, 39, 0.35);
+
+  /* -----------------------------------------------------------
+     GRADIENTS
+     ----------------------------------------------------------- */
+  --gradient-gold:  linear-gradient(135deg, #C9A227 0%, #E8C873 50%, #C9A227 100%);
+  --gradient-rose:  linear-gradient(135deg, #B76E79 0%, #E3A9B4 100%);
+  --gradient-ink:   linear-gradient(135deg, #241F1B 0%, #14110F 100%);
+
+  /* -----------------------------------------------------------
+     SHADOWS (warm-tinted, not pure black — reads "premium" not "flat")
+     ----------------------------------------------------------- */
+  --shadow-xs: 0 1px 2px rgba(36, 31, 27, 0.06);
+  --shadow-sm: 0 2px 8px rgba(36, 31, 27, 0.08);
+  --shadow-md: 0 8px 24px rgba(36, 31, 27, 0.10);
+  --shadow-lg: 0 16px 48px rgba(36, 31, 27, 0.16);
+  --shadow-gold: 0 6px 20px rgba(201, 162, 39, 0.25);
+
+  /* -----------------------------------------------------------
+     TYPOGRAPHY
+     Headings: Montserrat (already loaded in demo1.css)
+     Body:     Poppins, sans-serif (already loaded in demo1.css)
+     ----------------------------------------------------------- */
+  --font-heading: "Montserrat", sans-serif;
+  --font-body:    "Poppins, sans-serif";
+
+  --fs-h1: 2.75rem;   /* 44px */
+  --fs-h2: 2.25rem;   /* 36px */
+  --fs-h3: 1.75rem;   /* 28px */
+  --fs-h4: 1.375rem;  /* 22px */
+  --fs-h5: 1.125rem;  /* 18px */
+  --fs-h6: 1rem;      /* 16px */
+
+  --fs-body-lg: 1.0625rem; /* 17px */
+  --fs-body:    0.9375rem; /* 15px */
+  --fs-body-sm: 0.8125rem; /* 13px */
+  --fs-caption: 0.75rem;   /* 12px */
+  --fs-button:  0.875rem;  /* 14px */
+
+  --fw-light:    300;
+  --fw-regular:  400;
+  --fw-medium:   500;
+  --fw-semibold: 600;
+  --fw-bold:     700;
+  --fw-extrabold: 800;
+
+  --lh-tight:  1.2;
+  --lh-normal: 1.5;
+  --lh-loose:  1.75;
+
+  --ls-tight:  -0.01em;
+  --ls-normal: 0;
+  --ls-wide:   0.04em;
+  --ls-caps:   0.12em; /* uppercase labels / eyebrow text */
+
+  /* -----------------------------------------------------------
+     SPACING (4px base rhythm)
+     ----------------------------------------------------------- */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-7:  32px;
+  --space-8:  40px;
+  --space-9:  48px;
+  --space-10: 64px;
+  --space-11: 80px;
+  --space-12: 96px;
+
+  --section-space-sm: var(--space-9);
+  --section-space-md: var(--space-11);
+  --section-space-lg: var(--space-12);
+
+  /* -----------------------------------------------------------
+     RADIUS
+     ----------------------------------------------------------- */
+  --radius-xs:   4px;
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   16px;
+  --radius-xl:   24px;
+  --radius-pill: 999px;
+  --radius-circle: 50%;
+
+  /* -----------------------------------------------------------
+     CONTAINER WIDTHS (mirrors existing breakpoints, exposed as tokens)
+     ----------------------------------------------------------- */
+  --container-sm:  576px;
+  --container-md:  768px;
+  --container-lg:  992px;
+  --container-xl:  1170px;
+  --container-xxl: 1400px;
+
+  /* -----------------------------------------------------------
+     MOTION
+     ----------------------------------------------------------- */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
+}
+
+/* =================================================================
+   DARK THEME
+   Toggle by adding data-theme="dark" to <html> (see
+   dark-mode-toggle.js). Warm charcoal surfaces, lightened gold/rose
+   for contrast, never pure black / pure white.
+   ================================================================= */
+[data-theme="dark"] {
+  --color-primary:            #D9B863;
+  --color-primary-hover:      #E8C873;
+  --color-primary-active:     #C9A227;
+  --color-primary-light:      #3A331F;
+  --color-primary-contrast:   #1A1614;
+
+  --color-secondary:          #D28A96;
+  --color-secondary-hover:    #DE9DA8;
+  --color-secondary-active:   #C17B8B;
+  --color-secondary-light:    #3B2A2C;
+  --color-secondary-contrast: #1A1614;
+
+  --color-accent:              #C79B6E;
+  --color-accent-hover:        #D6AE83;
+
+  --color-background:  #14110F;
+  --color-surface:      #1C1815;
+  --color-card:          #211C19;
+  --color-card-alt:      #262019;
+  --color-border:         #332B24;
+  --color-divider:        #2B241F;
+  --color-overlay:        rgba(0, 0, 0, 0.75);
+
+  --color-success:       #7FAF8E;
+  --color-success-light: #23302A;
+  --color-warning:       #E0A94B;
+  --color-warning-light: #362B1B;
+  --color-error:         #E08088;
+  --color-error-light:   #362124;
+  --color-info:          #93AFCB;
+  --color-info-light:    #212B33;
+
+  --color-text-primary:   #F5F1EC;
+  --color-text-secondary: #C9C0B5;
+  --color-text-muted:     #948B7F;
+  --color-text-disabled:  #5B534A;
+  --color-text-on-dark:   #F5F1EC;
+
+  --state-hover-overlay:  rgba(255, 255, 255, 0.06);
+  --state-active-overlay: rgba(255, 255, 255, 0.10);
+  --state-selected-bg:    var(--color-primary-light);
+  --state-disabled-bg:    #241F1B;
+  --state-disabled-fg:    var(--color-text-disabled);
+  --state-focus-ring:     rgba(217, 184, 99, 0.4);
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.55);
+  --shadow-md: 0 10px 28px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 20px 56px rgba(0, 0, 0, 0.7);
+  --shadow-gold: 0 6px 20px rgba(217, 184, 99, 0.2);
+}

@@ -9,7 +9,7 @@ class ShippingMethod extends Model
 {
     use HasFactory;
     protected $fillable =[
-        'shipping_zone_id','name','type', 'cost', 'estimated_days', 'is_default','status'
+        'shipping_zone_id','name','type', 'cost', 'estimated_days', 'is_default','status','is_active'
     ];
     public function zone()
 {

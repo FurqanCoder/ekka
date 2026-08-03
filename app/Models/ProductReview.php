@@ -23,5 +23,14 @@ class ProductReview extends Model
     {
         return $this->belongsTo(Product::class);
     }
+    public function scopeApproved($query)
+{
+    return $query->where('approved', true);
+}
+
+public function scopePending($query)
+{
+    return $query->where('approved', false);
+}
 }
 

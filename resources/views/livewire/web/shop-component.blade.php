@@ -54,7 +54,7 @@
                             <div class="row">
                                 @forelse ($products as $product)
                                     <div class="col-lg-4 col-md-6 mb-4">
-                                        <x-product-card :product="$product" />
+                                        <x-product-card :product="$product" :showActions="true" add-cart-method="addToCart" wish-method="toggleWishlist" quick-view-method="showQuickView" />
                                     </div>
                                 @empty
                                     <div class="col-12">
@@ -185,6 +185,8 @@
     </section>
     <!-- End Shop page -->
 </div>
+
+@livewire('web.components.quick-view-modal')
 
 {{-- Optional JS: emit price range from a slider (if you use noUiSlider or any slider)
      Example usage (vanilla): Livewire.emit('applyPriceRange', minValue, maxValue)

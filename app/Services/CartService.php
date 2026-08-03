@@ -95,21 +95,34 @@ class CartService
      */
     public function updateQuantity($productId, $variantId = null, $quantity = 1)
     {
+        $normalizedQuantity = max(1, (int) $quantity);
+
         if (Auth::check()) {
             Cart::where('user_id', Auth::id())
                 ->where('product_id', $productId)
                 ->where('variant_id', $variantId)
-                ->update(['quantity' => max(1, $quantity)]);
+                ->update(['quantity' => $normalizedQuantity]);
         } else {
             $cart = collect(json_decode(Cookie::get($this->cookieName, '[]'), true));
-            $cart = $cart->map(function ($item) use ($productId, $variantId, $quantity) {
-                if ($item['product_id'] == $productId && $item['variant_id'] == $variantId) {
-                    $item['quantity'] = max(1, $quantity);
+            $cart = $cart->map(function ($item) use ($productId, $variantId, $normalizedQuantity) {
+                if (!is_array($item)) {
+                    return null;
                 }
+
+                if (($item['product_id'] ?? null) == $productId && ($item['variant_id'] ?? null) == $variantId) {
+                    $item['quantity'] = $normalizedQuantity;
+                }
+
                 return $item;
-            });
+            })->filter()->values();
+
             Cookie::queue($this->cookieName, json_encode($cart), $this->cookieMinutes);
         }
+
+        return [
+            'status' => 'success',
+            'message' => 'Cart updated successfully.',
+        ];
     }
 
     /**
@@ -173,4 +186,18 @@ class CartService
         // ✅ Clear cookie cart after merging
         Cookie::queue(Cookie::forget($this->cookieName));
     }
+    public function count()
+    {
+        if (Auth::check()) {
+            return Cart::where('user_id', Auth::id())->sum('quantity');
+        }
+
+        $cart = collect(json_decode(Cookie::get($this->cookieName, '[]'), true));
+        return $cart->sum('quantity');
+    }
+    public function isEmpty()
+    {
+        return $this->count() === 0;
+    }
+    
 }

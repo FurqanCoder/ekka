@@ -26,12 +26,7 @@ class AddressManager extends Component
     public $address_line_1;
     public $address_line_2;
     public $is_default = false;
-public $selectedAddressId = null;
-
-// public function selectAddress($id)
-// {
-//     $this->selectedAddressId = $id;
-// }
+    public $selectedAddressId = null;
 
     protected $rules = [
         'name' => 'required|string|max:191',
@@ -52,20 +47,31 @@ public $selectedAddressId = null;
 
     public function mount()
     {
-        $this->selectedAddressId = auth()->user()->addresses()->where('is_default', 1)->value('id');
+        // Fix: Check if user is logged in before accessing addresses
+        if (Auth::check()) {
+            $this->selectedAddressId = Auth::user()->addresses()->where('is_default', 1)->value('id');
+        } else {
+            $this->selectedAddressId = null;
+        }
         $this->loadAddresses();
     }
-    public function gotoPayment(){
 
+    public function gotoPayment()
+    {
+        if (!$this->selectedAddressId) {
+            $this->dispatch('notify', ['type' => 'error', 'message' => 'Please select an address first.']);
+            return;
+        }
+        
         session(['activeAddress' => $this->selectedAddressId]);
-        $this->dispatch('goTotab' , 'payment');
+        $this->dispatch('goTotab', 'payment');
     }
 
     public function loadAddresses()
     {
         $this->addresses = Auth::check()
             ? Auth::user()->addresses()->get()
-            : Address::whereNull('user_id')->get(); // adjust if guest addresses are tied to session
+            : collect(); // Return empty collection instead of null
     }
 
     public function showCreate()
@@ -99,6 +105,12 @@ public $selectedAddressId = null;
     public function save()
     {
         $this->validate();
+
+        // Fix: Check if user is logged in before saving
+        if (!Auth::check()) {
+            $this->dispatch('notify', ['type' => 'error', 'message' => 'Please login to save address']);
+            return;
+        }
 
         DB::transaction(function () {
             $payload = [
@@ -136,7 +148,16 @@ public $selectedAddressId = null;
 
         $this->resetForm();
         $this->loadAddresses();
-        $this->dispatch('notify', ['type' => 'success', 'message' => 'Address saved']);
+        $this->dispatch('notify', ['type' => 'success', 'message' => 'Address saved successfully!']);
+        
+        // Auto-select the newly saved address if it's the only one
+        if ($this->addresses->count() == 1) {
+            $this->selectedAddressId = $this->addresses->first()->id;
+            session(['activeAddress' => $this->selectedAddressId]);
+            
+            // Go to payment tab automatically
+            $this->dispatch('goTotab', 'payment');
+        }
     }
 
     public function deleteAddress(Address $address)
@@ -161,6 +182,7 @@ public $selectedAddressId = null;
         });
 
         $this->loadAddresses();
+        $this->dispatch('notify', ['type' => 'success', 'message' => 'Default address updated!']);
     }
 
     protected function resetForm()
@@ -179,16 +201,16 @@ public $selectedAddressId = null;
         $this->is_default = false;
         $this->resetValidation();
     }
-    public function selectAddress($id)
-{
-    $this->selectedAddressId = $id;
-    // store active address centrally (session)
-    session(['activeAddress' => $id]);
 
-    // notify parent checkout to recalc / move to payment automatically (if you want auto move)
-    // emitUp triggers parent listener 'goTotab' => 'tabShow'
-    $this->dispatch('goTotab', 'payment');
-}
+    public function selectAddress($id)
+    {
+        $this->selectedAddressId = $id;
+        // store active address centrally (session)
+        session(['activeAddress' => $id]);
+
+        // notify parent checkout to go to payment automatically
+        $this->dispatch('goTotab', 'payment');
+    }
 
     public function render()
     {
