@@ -232,11 +232,6 @@
                                 <div class="single-pro-img single-pro-img-no-sidebar" wire:ignore>
                                     <div class="single-product-scroll">
                                         {{-- 360 View --}}
-                                        <a class="ec-360-lbl" title="360 view" data-bs-toggle="modal"
-                                            data-bs-target="#ec_360_view_modal">
-                                            <img src="{{ asset('web/images/icons/360-degrees.png') }}" alt="360">
-                                        </a>
-
                                         {{-- MAIN COVER --}}
                                         <div class="single-product-cover" id="product-cover">
                                             {{-- First image slot → active variant OR default --}}

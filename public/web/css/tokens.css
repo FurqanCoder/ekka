@@ -171,6 +171,18 @@
   --duration-fast: 150ms;
   --duration-base: 250ms;
   --duration-slow: 400ms;
+
+  /* -----------------------------------------------------------
+     FIXED INK — deliberately dark brand bands (header-top bar,
+     footer, promo strips) that should stay dark in BOTH themes,
+     the same way the packaging's black never "goes light."
+     Defined once in :root only — never redefined in the
+     [data-theme="dark"] block below — so it is a true constant.
+     ----------------------------------------------------------- */
+  --color-ink-fixed:     #1A1614;
+  --color-ink-fixed-alt: #241F1B;
+  --color-on-ink-fixed:       #F5F1EC;
+  --color-on-ink-fixed-muted: rgba(245, 241, 236, 0.7);
 }
 
 /* =================================================================
@@ -214,7 +226,7 @@
 
   --color-text-primary:   #F5F1EC;
   --color-text-secondary: #C9C0B5;
-  --color-text-muted:     #948B7F;
+  --color-text-muted:     #A69C8F;
   --color-text-disabled:  #5B534A;
   --color-text-on-dark:   #F5F1EC;
 

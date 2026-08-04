@@ -1,16 +1,15 @@
 <div>
     <!-- Signup Modal -->
-    <div class="modal fade" id="signup" tabindex="-1" role="dialog" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal fade" id="signup" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content auth-modal">
-                <button type="button" class="btn-close qty_close" data-bs-dismiss="modal"
-                    aria-label="Close" id="signup-close-btn" style="display: none;"></button>
+                
 
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-5 d-none d-md-block">
                             <div class="auth-side-img">
-                                <img class="img-fluid" src="web/images/login-side.jpg" alt="Signup">
+                                <img class="img-fluid object-fit-cover w-100 h-100" src="{{asset('web/images/login/login_image.png')}}" alt="Signup">
                             </div>
                         </div>
 
@@ -43,7 +42,13 @@
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
-                                    <button type="submit" class="btn btn-primary w-100">Signup</button>
+                                    <button type="submit" class="btn btn-primary w-100"
+                                        wire:loading.attr="disabled" wire:target="register">
+                                        <span wire:loading wire:target="register"
+                                            class="spinner-border spinner-border-sm me-2"></span>
+                                        <span wire:loading.remove wire:target="register">Signup</span>
+                                        <span wire:loading wire:target="register">Creating account...</span>
+                                    </button>
                                 </form>
 
                                 <div class="auth-divider">
@@ -67,21 +72,21 @@
     </div>
 
     <!-- Login Modal -->
-    <div class="modal fade" id="login" tabindex="-1" role="dialog" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal fade" id="login" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content auth-modal">
-                <button type="button" class="btn-close qty_close" data-bs-dismiss="modal"
-                    aria-label="Close" id="login-close-btn" style="display: none;"></button>
+                
 
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-5 d-none d-md-block">
                             <div class="auth-side-img">
-                                <img class="img-fluid" src="web/images/login-side.jpg" alt="Login">
+                                <img class="img-fluid object-fit-cover w-100 h-100" src="{{asset('web/images/login/login_image.png')}}" alt="Login">
                             </div>
                         </div>
 
                         <div class="col-md-7 col-sm-12">
+                            
                             <div class="auth-content">
                                 <h4 class="ec-title">Welcome Back</h4>
                                 <p class="mb-3">Login to your account to continue</p>
@@ -103,7 +108,13 @@
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
-                                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                                    <button type="submit" class="btn btn-primary w-100"
+                                        wire:loading.attr="disabled" wire:target="login">
+                                        <span wire:loading wire:target="login"
+                                            class="spinner-border spinner-border-sm me-2"></span>
+                                        <span wire:loading.remove wire:target="login">Login</span>
+                                        <span wire:loading wire:target="login">Logging in...</span>
+                                    </button>
                                 </form>
 
                                 <div class="auth-divider">
@@ -128,77 +139,36 @@
 </div>
 
 <script>
-    // Modal control
-    window.addEventListener('switch-to-signup', () => {
-        const modalEl = document.getElementById('signup');
-        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-        
-        // Remove backdrop static to prevent closing on outside click
-        modalEl.setAttribute('data-bs-backdrop', 'static');
-        modalEl.setAttribute('data-bs-keyboard', 'false');
-        
-        modal.show();
-    });
+    function openAuthModal(id, force = false) {
+        const otherId = id === 'login' ? 'signup' : 'login';
+        hideAuthModal(otherId);
 
-    window.addEventListener('switch-to-login', () => {
-        const modalEl = document.getElementById('login');
-        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-        
-        // Remove backdrop static to prevent closing on outside click
-        modalEl.setAttribute('data-bs-backdrop', 'static');
-        modalEl.setAttribute('data-bs-keyboard', 'false');
-        
-        modal.show();
-    });
+        const modalEl = document.getElementById(id);
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl, {
+            backdrop: force ? 'static' : true,
+            keyboard: !force,
+        });
 
-    window.addEventListener('close-login', () => {
-        // Close signup modal
-        const signupModal = bootstrap.Modal.getInstance(document.getElementById('signup'));
-        if (signupModal) {
-            signupModal.hide();
-        }
-        
-        // Close login modal
-        const loginModal = bootstrap.Modal.getInstance(document.getElementById('login'));
-        if (loginModal) {
-            loginModal.hide();
-        }
-    });
-    // Force login for checkout
-window.addEventListener('force-login', (event) => {
-    // Open login modal
-    const loginModal = document.getElementById('login');
-    if (loginModal) {
-        const modal = bootstrap.Modal.getOrCreateInstance(loginModal);
-        loginModal.setAttribute('data-bs-backdrop', 'static');
-        loginModal.setAttribute('data-bs-keyboard', 'false');
+        modalEl.setAttribute('data-bs-backdrop', force ? 'static' : 'true');
+        modalEl.setAttribute('data-bs-keyboard', force ? 'false' : 'true');
+
+        const closeBtn = document.getElementById(id + '-close-btn');
+        if (closeBtn) closeBtn.style.display = force ? 'none' : 'block';
+
         modal.show();
     }
-});
 
-// Listen for force-login event from Livewire
-document.addEventListener('livewire:initialized', function () {
-    Livewire.on('force-login', (data) => {
-        const loginModal = document.getElementById('login');
-        if (loginModal) {
-            const modal = bootstrap.Modal.getOrCreateInstance(loginModal);
-            loginModal.setAttribute('data-bs-backdrop', 'static');
-            loginModal.setAttribute('data-bs-keyboard', 'false');
-            modal.show();
-        }
+    function hideAuthModal(id) {
+        const modalEl = document.getElementById(id);
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) modal.hide();
+    }
+
+    window.addEventListener('switch-to-signup', (e) => openAuthModal('signup', e.detail?.force ?? false));
+    window.addEventListener('switch-to-login', (e) => openAuthModal('login', e.detail?.force ?? false));
+
+    window.addEventListener('close-login', () => {
+        hideAuthModal('login');
+        hideAuthModal('signup');
     });
-    
-    Livewire.on('close-login', () => {
-        // Close both modals
-        ['login', 'signup'].forEach(id => {
-            const modalEl = document.getElementById(id);
-            if (modalEl) {
-                const modal = bootstrap.Modal.getInstance(modalEl);
-                if (modal) {
-                    modal.hide();
-                }
-            }
-        });
-    });
-});
 </script>

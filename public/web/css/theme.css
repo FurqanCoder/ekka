@@ -83,9 +83,10 @@ textarea:focus-visible,
 
 /* Utility bar (social icons / promo line) — dark ink, echoes the
    packaging's black, gives the header actual brand presence instead
-   of reading as plain white chrome. */
+   of reading as plain white chrome. Uses the FIXED ink token (not
+   --color-text-primary) so it stays dark in both themes. */
 .header-top {
-  background-color: var(--color-text-primary);
+  background-color: var(--color-ink-fixed);
   border-bottom: none;
 }
 .header-top-message,
@@ -93,7 +94,7 @@ textarea:focus-visible,
 .header-top a,
 .header-top-lan-curr .dropdown .dropdown-toggle,
 .header-top-lan-curr .dropdown .dropdown-toggle i {
-  color: var(--color-text-on-dark);
+  color: var(--color-on-ink-fixed);
 }
 .header-top-social ul li a {
   background: rgba(255, 255, 255, 0.08);
@@ -113,19 +114,37 @@ textarea:focus-visible,
 .ec-header-bottom { border-bottom: 1px solid var(--color-divider); }
 .nav-tabs, .ec-breadcrumb { border-color: var(--color-divider) !important; }
 
+/* Header icons (account / wishlist / cart / search) — force visible
+   against whatever surface color the header row currently is. */
+.header_svg,
+.header-icon i,
+.ec-header-bottons i,
+.ec-header-bottons .ec-header-btn,
+.ec-header-bottons .ec-header-btn .cart-amount,
+.ec-main-menu .ec-sidebar-toggle .header_svg path,
+.submit i, .submit .header_svg {
+  color: var(--color-text-primary);
+  fill: var(--color-text-primary);
+}
+.ec-header-bottons .ec-header-btn .ec-header-count {
+  background-color: var(--color-primary);
+  color: var(--color-primary-contrast);
+}
+
 /* Footer — dark ink with a gold top border, matching the packaging's
-   black-and-gold identity instead of stock white. */
+   black-and-gold identity. Uses the FIXED ink token so it can never
+   flip white in dark mode the way --color-text-primary would. */
 .ec-footer {
-  background-color: var(--color-text-primary);
-  color: rgba(245, 241, 236, 0.75);
+  background-color: var(--color-ink-fixed);
+  color: var(--color-on-ink-fixed-muted);
   border-top: 3px solid var(--color-primary);
 }
 .ec-footer .footer-top { border-color: rgba(255, 255, 255, 0.1); }
 .footer-bottom {
-  background-color: var(--color-text-primary);
+  background-color: var(--color-ink-fixed);
   border-color: rgba(255, 255, 255, 0.1) !important;
 }
-.footer-bottom .ec-copy { color: rgba(245, 241, 236, 0.7); }
+.footer-bottom .ec-copy { color: var(--color-on-ink-fixed-muted); }
 
 .ec-breadcrumb {
   background-color: var(--color-card-alt);
@@ -357,13 +376,19 @@ label, .form-label, .col-form-label {
 }
 .ec-product-inner:hover {
   box-shadow: var(--shadow-md);
+  border-color: var(--color-primary) !important;
   transform: translateY(-2px);
 }
+[data-theme="dark"] .ec-product-inner:hover {
+  box-shadow: 0 0 0 1px var(--color-primary), var(--shadow-md);
+}
 
-/* The base template sets .ec-pro-content padding to "0 0 0" horizontally
-   — fine when the card had no visible border, but now that cards have a
-   background/border/radius, text needs real inset padding. */
+/* The base template hardcodes background-color:#ffffff on this inner
+   panel (separately from .ec-product-inner), which is exactly why it
+   stayed a white box in dark mode even though the card wrapper
+   around it went dark. Force it onto the theme card color. */
 .ec-product-inner .ec-pro-content {
+  background-color: var(--color-card) !important;
   padding: var(--space-4) var(--space-4) var(--space-5);
 }
 .ec-product-inner .ec-pro-image {
@@ -629,5 +654,287 @@ tbody td, .ec-cart-content .table-content table tbody > tr td {
 .ec-rating .fill, i.ecicon.eci-star.fill, i.ecicon.eci-star-o.fill { color: var(--color-primary); }
 
 /* Scroll-to-top / floating buttons */
-#scrollUp { background-color: var(--color-text-primary); color: var(--color-text-on-dark); }
+#scrollUp { background-color: var(--color-ink-fixed); color: var(--color-on-ink-fixed); }
 #scrollUp:hover { background-color: var(--color-primary); color: var(--color-primary-contrast); }
+
+/* -----------------------------------------------------------------
+   13. FIXES — legacy hardcoded colors that were beating the theme
+   ----------------------------------------------------------------- */
+
+/* "Free Shipping / 24x7 Support / 30 Days Return / Payment Secure"
+   boxes hardcode background:#fff and text colors #444/#777 directly,
+   completely independent of .card — so they stayed white tiles on a
+   black page in dark mode. */
+.ec_ser_inner {
+  background-color: var(--color-card) !important;
+  border-color: var(--color-border) !important;
+}
+.ec-service-desc h2 { color: var(--color-text-primary) !important; }
+.ec-service-desc p  { color: var(--color-text-muted) !important; }
+
+/* Section subtitles ("Browse the collection of...") hardcode #777,
+   which is nearly invisible on a dark background. */
+.section-title .sub-title { color: var(--color-text-muted) !important; }
+
+/* Category-circle "Shop Now" pills (and any other .btn-primary
+   instance nested inside a more specific legacy selector) were
+   winning on specificity and staying stock blue. !important forces
+   the brand color to win everywhere, unconditionally. */
+.btn-primary,
+.btn-check:checked + .btn-primary,
+.btn-check:active + .btn-primary,
+.show > .btn-primary.dropdown-toggle {
+  background-color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+  color: var(--color-primary-contrast) !important;
+}
+.btn-primary:hover {
+  background-color: var(--color-primary-hover) !important;
+  border-color: var(--color-primary-hover) !important;
+}
+.btn-secondary, .btn-color-dark {
+  background-color: var(--color-secondary) !important;
+  border-color: var(--color-secondary) !important;
+  color: var(--color-secondary-contrast) !important;
+}
+.btn-secondary:hover, .btn-color-dark:hover, .btn-hover-color-primary:hover {
+  background-color: var(--color-secondary-hover) !important;
+  border-color: var(--color-secondary-hover) !important;
+}
+
+/* Subtle depth in dark mode: a very soft vignette instead of one flat
+   black slab, so sections don't all read as the exact same void. */
+[data-theme="dark"] body {
+  background-image: radial-gradient(
+    ellipse 1400px 900px at 50% 0%,
+    var(--color-surface) 0%,
+    var(--color-background) 55%
+  );
+  background-attachment: fixed;
+}
+
+/* -----------------------------------------------------------------
+   15. SINGLE PRODUCT PAGE
+   This template hardcodes background:#fff on the info panel and the
+   tab-content panel, and hardcodes dark ink text (#202020/#444/#777)
+   on top of them — completely independent of everything themed
+   above. Flipping the panel to a dark card without also flipping
+   this text would just swap one invisible-text bug for another.
+   ----------------------------------------------------------------- */
+.ec-breadcrumb {
+  background-color: var(--color-card-alt) !important;
+  border-top-color: var(--color-divider) !important;
+  border-bottom-color: var(--color-divider) !important;
+}
+
+.single-pro-img {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  /* kept on a light backdrop deliberately — product photography reads
+     truest on a neutral light canvas even in dark mode (same reason
+     Amazon/Sephora do this) */
+  background-color: #ffffff;
+}
+.single-nav-thumb .single-slide { padding: 6px 6px 0 6px; }
+.single-nav-thumb .slick-slide img {
+  border-radius: var(--radius-sm);
+  border-color: var(--color-border) !important;
+}
+.single-nav-thumb .slick-slide:hover img,
+.single-nav-thumb .slick-slide.slick-current.slick-active img {
+  border-color: var(--color-primary) !important;
+}
+
+.single-pro-desc {
+  background-color: var(--color-card) !important;
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+  box-shadow: var(--shadow-sm);
+}
+@media (max-width: 767px) {
+  .single-pro-desc { padding: var(--space-5); }
+}
+
+.single-pro-content .ec-single-title { color: var(--color-text-primary) !important; }
+.single-pro-content p,
+.single-pro-content .single-para,
+.single-pro-content .ec-single-rating-wrap .ec-read-review a {
+  color: var(--color-text-secondary) !important;
+}
+.single-pro-content .ec-single-desc,
+.single-pro-content .ec-single-count-desc {
+  color: var(--color-text-muted) !important;
+}
+.single-pro-content .ec-single-rating { border-right-color: var(--color-divider); }
+.single-pro-content .ec-single-price-stoke {
+  border-bottom-color: var(--color-divider) !important;
+}
+.single-pro-content .ec-single-price-stoke .ec-single-ps-title,
+.single-pro-content .ec-single-price-stoke .ec-single-sku {
+  color: var(--color-text-primary) !important;
+}
+.single-pro-content .ec-single-price span.new-price {
+  color: var(--color-primary-active) !important;
+}
+.single-pro-content .ec-pro-variation {
+  border-bottom-color: var(--color-divider) !important;
+}
+.single-pro-content .ec-pro-variation .ec-pro-variation-inner > span {
+  color: var(--color-text-primary) !important;
+}
+
+/* Material / size chip swatches — solid gold pill for "selected" so it
+   reads unmistakably as chosen, never a subtle tint that can be
+   misread. Un-scoped from any single ancestor so this applies
+   consistently everywhere these swatches appear (single product page,
+   quickview modal, shop listing). */
+.ec-pro-variation-content li,
+.ec-pro-size li a,
+.ec-pro-variation .ec-pro-variation-inner.ec-pro-variation-size .ec-pro-variation-content li {
+  background-color: var(--color-card-alt) !important;
+  color: var(--color-text-secondary) !important;
+  border-radius: var(--radius-pill) !important;
+  min-width: 44px;
+  text-align: center;
+  transition: background-color var(--duration-fast) var(--ease-standard),
+              color var(--duration-fast) var(--ease-standard);
+}
+.ec-pro-variation-content li:hover,
+.ec-pro-size li a:hover {
+  background-color: var(--color-primary-light) !important;
+  color: var(--color-primary-active) !important;
+}
+.ec-pro-variation-content .active,
+.ec-pro-size li.active a {
+  background-color: var(--color-primary) !important;
+  color: var(--color-primary-contrast) !important;
+  font-weight: var(--fw-semibold);
+  box-shadow: none !important;
+}
+
+/* Color swatches keep their true hue; only the "selected" ring changes */
+.ec-pro-variation .ec-pro-variation-inner.ec-pro-variation-color .ec-pro-variation-content .active,
+.ec-pro-color li.active,
+.ec-pro-color li:hover {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 2px var(--color-primary);
+}
+
+/* Harden spacing between variation groups (Material / Color / etc.) so
+   a product with multiple groups can never visually overlap — each
+   group gets its own divider and breathing room, independent of how
+   many groups the product data defines. */
+.ec-pro-variation,
+.single-pro-content .ec-pro-variation {
+  position: relative;
+  isolation: isolate;
+  margin-bottom: var(--space-4) !important;
+  padding-bottom: var(--space-4) !important;
+  border-bottom: 1px solid var(--color-divider) !important;
+}
+.ec-pro-variation:last-of-type {
+  border-bottom: none !important;
+  margin-bottom: var(--space-5) !important;
+}
+.ec-pro-variation-inner { margin-bottom: var(--space-2) !important; }
+.ec-pro-variation-content { position: relative; z-index: 1; }
+
+/* Thin gold eyebrow rule above the product title — small brand touch
+   that echoes the section-title underline elsewhere on the site. */
+.single-pro-content .ec-single-title {
+  position: relative;
+  padding-top: var(--space-3);
+}
+.single-pro-content .ec-single-title::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 32px;
+  height: 3px;
+  background: var(--color-primary);
+  border-radius: var(--radius-pill);
+}
+
+/* Custom themed tooltip for any element using data-tip (the pattern
+   already used by product-card quick-action icons). Gives a branded,
+   intentional-looking bubble instead of relying on the unstylable
+   native browser title tooltip. To use: replace title="Wool" with
+   data-tip="Wool" in markup where you want this styling. */
+[data-tip] { position: relative; }
+[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--color-ink-fixed);
+  color: var(--color-on-ink-fixed);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-medium);
+  padding: 4px 10px;
+  border-radius: var(--radius-xs);
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--duration-fast) var(--ease-standard);
+  z-index: 20;
+  pointer-events: none;
+}
+[data-tip]:hover::after,
+[data-tip]:focus-visible::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Qty stepper */
+.single-pro-content .ec-single-qty .qty-plus-minus {
+  border-color: var(--color-border) !important;
+}
+.single-pro-content .ec-single-qty .qty-plus-minus .ec_qtybtn { color: var(--color-text-secondary); }
+.single-pro-content .ec-single-qty .qty-plus-minus input.qty-input { color: var(--color-text-primary) !important; }
+
+/* Wishlist / quickview circular icon buttons next to Add to Cart */
+.single-pro-content .ec-single-qty .ec-btn-group {
+  background-color: var(--color-card-alt) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
+.single-pro-content .ec-single-qty .ec-btn-group .svg_img.pro_svg { fill: var(--color-text-primary); }
+.single-pro-content .ec-single-qty .ec-btn-group:hover {
+  background-color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+  color: var(--color-primary-contrast) !important;
+}
+.single-pro-content .ec-single-qty .ec-btn-group:hover .svg_img.pro_svg { fill: var(--color-primary-contrast); }
+
+/* Social-share row */
+.single-pro-content .ec-single-social ul li a {
+  background-color: var(--color-card-alt);
+  color: var(--color-text-secondary);
+}
+
+/* Tab content panel below the product (Details / More Info / Reviews) */
+.ec-single-pro-tab-content {
+  background-color: var(--color-card) !important;
+  border-color: var(--color-border) !important;
+  border-radius: 0 var(--radius-md) var(--radius-md) var(--radius-md);
+  color: var(--color-text-secondary);
+}
+.ec-single-pro-tab-content .ec-single-pro-tab-desc p,
+.ec-single-pro-tab-content .ec-single-pro-tab-desc li,
+.ec-single-pro-tab-content .ec-single-pro-tab-moreinfo p,
+.ec-single-pro-tab-content .ec-single-pro-tab-moreinfo li {
+  color: var(--color-text-secondary) !important;
+}
+.ec-single-pro-tab-content .ec-single-pro-tab-moreinfo li span { color: var(--color-text-primary) !important; }
+.ec-single-pro-tab-content .ec-t-review-item { border-bottom-color: var(--color-divider) !important; }
+.ec-single-pro-tab-content .ec-t-review-top .ec-t-review-name { color: var(--color-text-primary) !important; }
+.ec-single-pro-tab-content .ec-ratting-content h3 { color: var(--color-text-primary) !important; }
+.ec-single-pro-tab-content .ec-ratting-content .ec-ratting-input input,
+.ec-single-pro-tab-content .ec-ratting-content .ec-ratting-input textarea {
+  background-color: var(--color-card-alt) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-primary) !important;
+}
