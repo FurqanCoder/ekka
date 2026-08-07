@@ -60,7 +60,7 @@
     @livewire('web.components.global.mobile-footer')
    
     <!-- Footer navigation panel for responsive display end -->
-    
+    @livewire('web.chat.ai-chatbot')
     @include('components.web.floating')
     @include('partials.web.footer')
 
