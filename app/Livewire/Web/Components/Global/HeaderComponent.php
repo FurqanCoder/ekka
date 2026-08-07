@@ -43,7 +43,9 @@ class HeaderComponent extends Component
     public function showSignup(){
         $this->dispatch('showSignup');
     }
-    
+    public function showLogin(){
+        $this->dispatch('showLogin');
+    }
     public function render()
     {
         return view('livewire.web.components.global.header-component');

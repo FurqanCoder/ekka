@@ -131,6 +131,28 @@ textarea:focus-visible,
   color: var(--color-primary-contrast);
 }
 
+/* On mobile these same icons relocate into .header-top, which is a
+   DARK bar (var(--color-ink-fixed)) — the rule above would make them
+   dark-on-dark and invisible there. This is why wishlist/cart looked
+   "hidden": same color as the background, not actually display:none.
+   Higher-specificity context override, so it wins regardless of
+   source order. */
+.header-top .header_svg,
+.header-top .header-icon i,
+.header-top .ec-header-bottons i,
+.header-top .ec-header-bottons .ec-header-btn,
+.header-top .ec-header-bottons .ec-header-btn .cart-amount,
+.header-top .ec-main-menu .ec-sidebar-toggle .header_svg path,
+.header-top .submit i,
+.header-top .submit .header_svg {
+  color: var(--color-on-ink-fixed) !important;
+  fill: var(--color-on-ink-fixed) !important;
+}
+.header-top .ec-header-bottons .ec-header-btn .ec-header-count {
+  background-color: var(--color-primary) !important;
+  color: var(--color-primary-contrast) !important;
+}
+
 /* Footer — dark ink with a gold top border, matching the packaging's
    black-and-gold identity. Uses the FIXED ink token so it can never
    flip white in dark mode the way --color-text-primary would. */
@@ -886,6 +908,151 @@ tbody td, .ec-cart-content .table-content table tbody > tr td {
 [data-tip]:focus-visible::after {
   opacity: 1;
   visibility: visible;
+}
+
+/* -----------------------------------------------------------------
+   16. MOBILE HEADER & MOBILE NAV — modernized
+   ----------------------------------------------------------------- */
+@media (max-width: 767px) {
+  /* Sticky, single-color nav row instead of a static heavy stack —
+     the utility bar above it (social icons/hamburger) stays put,
+     but the logo/search row now follows scroll like a modern app
+     header. */
+  .ec-header-bottom {
+    position: sticky;
+    top: 0;
+    z-index: 15;
+    padding: var(--space-3) 0;
+    box-shadow: var(--shadow-xs);
+  }
+
+  .header-logo img { width: 110px; }
+
+  /* Compact pill search instead of a full-height boxy input —
+     the single biggest "dated template" tell on mobile headers. */
+  .header-search { width: 100%; }
+  .header-search .form-control {
+    height: 42px;
+    min-height: 42px;
+    border-radius: var(--radius-pill);
+    padding-left: var(--space-4);
+    font-size: var(--fs-body-sm);
+  }
+  .submit {
+    width: 42px;
+    right: 2px;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Utility bar icon row (hamburger / account / wishlist / cart) —
+     even spacing, consistent sizing, gold badges instead of
+     mismatched defaults. */
+  .header-top { padding: var(--space-2) var(--space-4); }
+  .header-top .ec-header-bottons,
+  .header-top .ec-main-menu .ec-sidebar-toggle {
+    display: flex;
+    align-items: center;
+  }
+  .header-top .ec-header-bottons > * + * { margin-left: var(--space-4); }
+}
+
+/* Bottom fixed mobile nav toolbar (hamburger / home / cart / account) */
+.ec-nav-toolbar {
+  background-color: var(--color-surface) !important;
+  border-top: 1px solid var(--color-border);
+  box-shadow: 0 -4px 16px rgba(36, 31, 27, 0.08);
+}
+.ec-nav-toolbar .ec-nav-panel-icons a i,
+.ec-nav-toolbar .ec-nav-panel-icons a .header_svg {
+  color: var(--color-text-primary);
+  fill: var(--color-text-primary);
+}
+.ec-nav-toolbar .ec-nav-panel-icons a:hover i,
+.ec-nav-toolbar .ec-nav-panel-icons a.active i {
+  color: var(--color-primary);
+}
+.ec-nav-toolbar .ec-nav-panel-icons a .ec-cart-noti {
+  background-color: var(--color-primary) !important;
+  color: var(--color-primary-contrast) !important;
+}
+
+/* Mobile off-canvas menu (Contact us / Information / Account / …) */
+.ec-side-cart.ec-mobile-menu {
+  background-color: var(--color-ink-fixed);
+}
+.ec-side-cart.ec-mobile-menu .ec-menu-inner .ec-menu-content ul li a {
+  color: var(--color-on-ink-fixed);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+.ec-side-cart.ec-mobile-menu .ec-menu-inner .ec-menu-content ul li:hover > a {
+  color: var(--color-primary);
+}
+.ec-menu-content > ul > li .menu-toggle::before { color: var(--color-primary); }
+.ec-side-cart.ec-mobile-menu .ec-menu-title .menu_title { color: var(--color-primary); }
+.ec-side-cart.ec-mobile-menu .ec-menu-title { border-bottom-color: rgba(255, 255, 255, 0.12); }
+.ec-side-cart.ec-mobile-menu .ec-menu-title .ec-close { color: var(--color-on-ink-fixed); }
+.ec-side-cart.ec-mobile-menu .ec-menu-inner .ec-social li a {
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
+}
+.ec-side-cart.ec-mobile-menu .ec-menu-inner .ec-social li a:hover { background: var(--color-secondary); }
+
+/* Defensive reset: if a carousel/slider container hasn't been
+   initialized by JS yet, don't let it reserve a tall empty block —
+   this cannot fix a JS-timing issue by itself, but prevents an
+   un-initialized track from holding a large blank gap open. */
+.slick-initialized .slick-slide { min-height: 0 !important; }
+[class*="ec-fre-products"], [class*="ec-spe-products"] { min-height: 0; }
+
+/* -----------------------------------------------------------------
+   16. MOBILE HEADER / BOTTOM NAV TOOLBAR
+   ----------------------------------------------------------------- */
+
+/* The base template already hides the promo message and social icons
+   inside .header-top below ~767px — but never hides the bar itself,
+   so it was rendering as an empty solid-black stripe with nothing in
+   it. If there's genuinely no content left at this width, remove the
+   bar entirely instead of showing a blank band. */
+@media (max-width: 767px) {
+  .header-top { display: none !important; }
+}
+
+/* Bottom fixed mobile toolbar (hamburger / wishlist / home / install) */
+.ec-nav-toolbar {
+  background-color: var(--color-surface) !important;
+  border-top: 1px solid var(--color-border);
+}
+.ec-nav-toolbar .ec-nav-panel-icons a i {
+  color: var(--color-text-primary) !important;
+}
+.ec-nav-toolbar .ec-nav-panel-icons a .ec-cart-noti {
+  background-color: var(--color-secondary) !important;
+  color: #fff !important;
+}
+.ec-nav-toolbar .ec-nav-panel-icons .header_svg,
+.ec-nav-toolbar .ec-nav-panel-icons .header_svg path {
+  fill: var(--color-text-primary) !important;
+}
+
+/* Any call-to-action button living in the bottom toolbar (e.g. an
+   "Add to Home Screen" / PWA-install prompt) should carry the brand
+   gold, not the template's stock blue. Covers the common naming
+   patterns for this kind of control; if a differently-named button
+   still shows blue, share its exact class/id and it can be targeted
+   precisely. */
+.ec-nav-toolbar .btn,
+.ec-nav-toolbar button:not(.ec-nav-panel-icons a),
+#pwa-install-button,
+.pwa-install-btn,
+.add-to-home-screen,
+[class*="add-to-home"],
+[class*="pwa-install"] {
+  background-color: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+  color: var(--color-primary-contrast) !important;
 }
 
 /* Qty stepper */

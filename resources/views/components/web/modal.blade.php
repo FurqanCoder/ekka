@@ -25,7 +25,7 @@
  <!-- Newsletter Modal end -->
 
  <!-- 360 Modal -->
- <div class="modal fade" id="ec_360_view_modal" tabindex="-1" role="dialog">
+ {{-- <div class="modal fade" id="ec_360_view_modal" tabindex="-1" role="dialog">
      <div class="modal-dialog modal-dialog-centered" role="document">
          <div class="modal-content">
              <div class="modal-body">
@@ -83,7 +83,7 @@
              </div>
          </div>
      </div>
- </div>
+ </div> --}}
  <!-- Modal end -->
 
 
@@ -127,4 +127,3 @@
          object-fit: cover;
      }
  </style>
- @livewire('web.auth.customer-register-component')

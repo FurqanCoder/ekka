@@ -44,19 +44,21 @@
     <!-- Main Slider End -->
 
     @yield('web-content')
+ @livewire('web.auth.customer-register-component')
 
-    @livewire('web.components.pwa-install-popup')
+    {{-- @livewire('web.components.pwa-install-popup') --}}
     
     <!-- Footer Start -->
     @include('components.web.footer')
     <!-- Footer Area End -->
 
     <!-- Modal -->
-    @include('components.web.modal')
+    {{-- @include('components.web.modal') --}}
     <!-- Newsletter Modal end -->
 
     <!-- Footer navigation panel for responsive display -->
-    @include('components.web.mobile-footer')
+    @livewire('web.components.global.mobile-footer')
+   
     <!-- Footer navigation panel for responsive display end -->
     
     @include('components.web.floating')
@@ -253,7 +255,17 @@
             localStorage.setItem('pwa_installed', 'true');
         });
     </script>
-
+{{-- chatbot --}}
+<script>
+    // Global Alpine store for chatbot open/close state.
+    // Accessible from ANY element on the page, regardless of which
+    // Livewire/Blade component it lives in.
+    document.addEventListener('alpine:init', () => {
+        Alpine.store('chatbot', {
+            open: false,
+        });
+    });
+</script>
 </body>
 
 </html>

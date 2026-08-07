@@ -1567,8 +1567,8 @@
     <!-- New Product Start -->
     {{-- <button class="btn btn-warning" wire:click="testNotification">send notification</but> --}}
     <button id="a2hs-btn" onclick="installPWA()"
-        style="position:fixed; bottom:20px; right:20px; padding:10px 20px; background:#1e40af; color:white; border:none; border-radius:8px; z-index:999;">
-        Add to Home Screen
+        style="position:fixed; bottom:300px; right:20px; padding:10px 20px; background:#1e40af; color:white; border:none; border-radius:8px; z-index:999;">
+        <i class="fi fi-rr-download"></i>
     </button>
 
     <section class="section ec-new-product section-space-p" id="arrivals">

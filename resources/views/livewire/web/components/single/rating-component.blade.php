@@ -71,7 +71,7 @@
                             </button>
                         </div>
                     @else
-                        <p class="text-muted">Please login to leave a review.</p>
+                        <p class="text-muted">Please <a class="btn btn-primary" wire:click="showLogin">login</a> to add a review.</p>
                     @endauth
 
                 </div>

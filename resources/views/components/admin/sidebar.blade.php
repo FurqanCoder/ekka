@@ -1,21 +1,4 @@
 <aside class="side-mini-panel with-vertical">
-    {{--
-        Active-state logic:
-        $activeSection tells us which of the 7 mini-nav tabs/panels should be "open" for the
-        current request. Each mini-nav-item (mini-1..mini-7) and its matching panel
-        (menu-right-mini-1..7) gets an "active" class when $activeSection matches its number.
-        Individual links inside also get "active" when the current route matches exactly.
-
-        NOTE: this template's JS normally switches panels on click by toggling "active" on
-        mini-nav-item + menu-right-mini-N. I'm relying on that same "active" class here so it
-        should integrate with your existing sidebarmenu.js. If your JS instead expects a
-        different class (e.g. "show" or an inline style toggle) to reveal the panel on page
-        load, tell me which and I'll match it exactly — otherwise the icon may not visually
-        look "selected" even though the correct panel is showing underneath.
-
-        Route::has() guards stay in place so a missing/renamed route falls back to "#"
-        instead of throwing RouteNotFoundException.
-    --}}
     @php
         $activeSection = match(true) {
             request()->routeIs('admin.dashboard') => 1,
@@ -95,7 +78,7 @@
                             <span class="hide-menu">Dashboards</span>
                         </li>
                         <li class="sidebar-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                            <a class="sidebar-link" href="{{ Route::has('admin.dashboard') ? route('admin.dashboard') : url('/admin') }}" id="get-url" aria-expanded="false">
+                            <a class="sidebar-link" href="{{ Route::has('admin.dashboard') ? route('admin.dashboard') : url('/admin/deshboard') }}" id="get-url" aria-expanded="false">
                                 <iconify-icon icon="solar:widget-4-line-duotone"></iconify-icon>
                                 <span class="hide-menu">Overview</span>
                             </a>

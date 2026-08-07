@@ -8,8 +8,8 @@
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-5 d-none d-md-block">
-                            <div class="auth-side-img">
-                                <img class="img-fluid object-fit-cover w-100 h-100" src="{{asset('web/images/login/login_image.png')}}" alt="Signup">
+                            <div class="auth-side-img" style="height: 100%; width: 100%;">
+                                <img class="img-fluid object-fit-cover w-100 h-100"  src="{{asset('web/images/login/login_image.png')}}" alt="Signup">
                             </div>
                         </div>
 

@@ -213,7 +213,7 @@ class WebProductComponent extends Component
                 'message' => 'Redirecting to checkout...',
                 'type'    => 'success',
             ]);
-            return redirect()->route('checkout');
+            return redirect()->route('web-check-out');
         } else {
             $this->dispatch('toast', [
                 'message' => $result['message'] ?? 'Failed to process buy now.',
@@ -245,5 +245,9 @@ class WebProductComponent extends Component
             'hasOffer' => $this->hasOffer,
             'offerDetails' => $this->offerDetails,
         ])->extends('layouts.web')->section('web-content');
+    }
+    public function showLogin()
+    {
+        $this->dispatch('showLogin');
     }
 }

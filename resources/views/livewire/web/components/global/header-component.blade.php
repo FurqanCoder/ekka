@@ -114,8 +114,8 @@
                                     <ul class="dropdown-menu dropdown-menu-right">
                                         @guest
                                             {{-- TODO: replace with real login/register routes once auth is built --}}
-                                            <li><button class="dropdown-item" wire:click="showSignup">Login</button></li>
-                                            <li><a class="dropdown-item" href="#">Register</a></li>
+                                            <li><button class="dropdown-item" wire:click="showLogin">Login</button></li>
+                                            <li><a class="dropdown-item" wire:click="showSignup">Register</a></li>
                                         @endguest
 
                                         @auth
@@ -125,7 +125,8 @@
                                     </ul>
                                 </div>
 
-                                <button class="ec-header-btn" data-theme-toggle aria-label="Toggle dark mode">🌙</button>
+                                <button class="ec-header-btn" data-theme-toggle aria-label="Toggle dark mode"><i
+                                            class="fi-rr-moon"></i></button>
                                 <a href="{{ route('web.wish') }}" class="ec-header-btn ec-header-wishlist">
                                     @livewire('web.components.wish.wish-icon')
                                 </a>
@@ -223,7 +224,7 @@
                 <div class="ec-menu-content">
                     <ul>
                         <li><a href="{{ route('home') }}">Home</a></li>
-                        <li><a href="{{ route('web.shop') }}">Shop</a></li>
+                        <li><a href="{{ route('web.filter') }}">Shop</a></li>
                         <li><a href="{{ route('web.wish') }}">Wishlist</a></li>
                         <li><a href="{{ route('web-cart') }}">Cart</a></li>
                         <li><a href="{{ route('web-check-out') }}">Checkout</a></li>
@@ -242,14 +243,10 @@
                 <div class="header-res-social">
                     <div class="header-top-social">
                         <ul class="mb-0">
-                            <li class="list-inline-item"><a class="hdr-facebook" href="#"><i
-                                        class="ecicon eci-facebook"></i></a></li>
-                            <li class="list-inline-item"><a class="hdr-twitter" href="#"><i
-                                        class="ecicon eci-twitter"></i></a></li>
-                            <li class="list-inline-item"><a class="hdr-instagram" href="#"><i
-                                        class="ecicon eci-instagram"></i></a></li>
-                            <li class="list-inline-item"><a class="hdr-linkedin" href="#"><i
-                                        class="ecicon eci-linkedin"></i></a></li>
+                            @foreach (\App\Helpers\WebsiteHelper::getSocialLinks() as $platform => $url)
+                            <li class="list-inline-item"><a class="hdr-{{ $platform }}" href="{{$url}}"><i
+                                        class="ecicon eci-{{ $platform }}"></i></a></li>
+                            @endforeach
                         </ul>
                     </div>
                 </div>
